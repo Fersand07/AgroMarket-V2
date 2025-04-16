@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useAuth } from "../../hooks/UseAuth"
 import { useNavigate } from "react-router-dom"
 import Button from "../../components/Button"
+import Input from "../../components/Input"
 
 const LoginForm = () => {
     const [username, setUsername] = useState('')
@@ -12,7 +13,7 @@ const LoginForm = () => {
     const navigate = useNavigate()
     
     const handleSubmit = async (e) => {
-        e.preventDefault
+        e.preventDefault()
         setError(null)
 
         try {
@@ -24,23 +25,24 @@ const LoginForm = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input 
+        <form className="flex flex-col items-center space-y-4 m-4" onSubmit={handleSubmit}>
+            <Input 
                 type="text"
-                placeholder="Usuario"
+                placeHolder="Usuario"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                required
+                required 
             />
-            <input
+            <Input
                 type="password"
-                placeholder="Contraseña"
+                placeHolder="Contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
             />
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            <Button type="submit" > Iniciar Sesion </Button>
+            <Button type="submit" className="w-5/6" >Iniciar Sesion</Button>
+            <p className="text-white font-poppins font-bold">¿No tienes cuenta? <span className="text-black font-bold "><a href="/register">Registrate</a></span></p>
         </form>
     )
 }

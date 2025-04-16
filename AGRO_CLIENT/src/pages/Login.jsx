@@ -1,10 +1,18 @@
 import LoginForm from "../features/auth/LoginForm"
+import bgImage from "../assets/bg-forms1.svg"
+import Logo from "../assets/AGROMARKET.svg"
 
 const Login = () => {
+
     return (
-        <div className="login-container">
-            <h2 className="text-3xl font-poppins" >Iniciar Sesion</h2>
-            <LoginForm/>
+        <div className="flex flex-row">
+            <div className=" flex flex-col justify-center items-center gap-14 w-2xl login-container bg-primaryColor">
+                <div className="w-48 h-48 bg-altBgColor rounded-full">
+                    <img  src={Logo} />
+                </div>
+                <LoginForm/>
+            </div>
+            <img  className="h-screen" src={bgImage}/>
         </div>
     )
 }

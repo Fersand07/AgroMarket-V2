@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
-export const generateToken = (id) => {
+export const generateToken = (id, role) => {
     const expiresIn = 60 * 15;
     try {
-        const token = jwt.sign({ id }, process.env.SECRET_KEY, { expiresIn: expiresIn });
+        const token = jwt.sign({ id, role }, process.env.SECRET_KEY, { expiresIn: expiresIn });
         return { token, expiresIn };
     }
     catch (e) {
@@ -10,10 +10,10 @@ export const generateToken = (id) => {
     }
 }
 
-export const generateRefreshToken = (id, res) => {
+export const generateRefreshToken = (id, role,  res) => {
     const expiresIn = 60 * 60 * 24 * 30;
     try {
-        const refreshToken = jwt.sign({ id }, process.env.REFRESH_KEY, { expiresIn });
+        const refreshToken = jwt.sign({ id, role }, process.env.REFRESH_KEY, { expiresIn });
         res.cookie('refreshToken', refreshToken, { 
             httpOnly: true, 
             secure: !(process.env.MODE === "developer"),  

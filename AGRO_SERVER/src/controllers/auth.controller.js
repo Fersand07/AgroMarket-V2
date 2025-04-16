@@ -13,8 +13,8 @@ export const login = async (req, res) => {
     if (!passwordResponse) {
       return res.status(403).json({ message: "Password is incorrect" });
     }
-    const { token, expiresIn } = generateToken(user.id)
-    generateRefreshToken(user.id, res)
+    const { token, expiresIn } = generateToken(user.id, user.role)
+    generateRefreshToken(user.id,  user.role,   res)
     return res.status(200).json({ token, expiresIn });
 
   } catch (error) {
