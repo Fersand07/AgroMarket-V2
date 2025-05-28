@@ -101,7 +101,7 @@ const RegisterForm = () => {
                 />
 
                 {/* Dirección con botón para mapa */}
-                <div className="relative w-5/6">
+                <div className="w-6/6 relative ">
                     <Input
                         type="text"
                         placeHolder="Dirección"
@@ -148,7 +148,7 @@ const RegisterForm = () => {
                 />
 
                 {errors.default && (
-                    <p className="text-red-700 font-poppins font-bold">{errors.default}</p>
+                    <p className="text-white-700 font-poppins font-bold">{errors.default}</p>
                 )}
 
                 <Button type="submit" className="w-5/6">Registrate</Button>
