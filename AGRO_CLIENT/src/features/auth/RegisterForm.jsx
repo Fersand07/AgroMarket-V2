@@ -101,23 +101,24 @@ const RegisterForm = () => {
                 />
 
                 {/* Dirección con botón para mapa */}
-                <div className="w-6/6 relative ">
-                    <Input
-                        type="text"
-                        placeHolder="Dirección"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        required
-                        className="pr-10 w-full"
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setIsModalOpen(true)}
-                        className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-black text-lg"
-                    >
-                        📍
-                    </button>
+                <div className="w-full relative">
+                <textarea
+                  placeholder="Dirección"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  required
+                  className="pr-10 w-full h-25 resize-none border rounded px-3 py-2 bg-white text-black"
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                 className="absolute top-3 right-3 text-gray-600 hover:text-black text-lg"
+                >
+                    📍
+                 </button>
                 </div>
+
+
 
                 <Input
                     type="text"
