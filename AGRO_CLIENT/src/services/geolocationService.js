@@ -8,7 +8,7 @@ export const geolocationService = async (lat, lng) => {
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
         {
             headers: {
-                'User-Agent': 'AgroMarketApp/1.0 (tucorreo@ejemplo.com)' // ¡Importante!
+                'User-Agent': 'AgroMarketApp/1.0 (tucorreo@ejemplo.com)' 
             }
         }
     )

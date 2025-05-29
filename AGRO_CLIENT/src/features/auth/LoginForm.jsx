@@ -3,6 +3,7 @@ import { useAuth } from "../../hooks/UseAuth"
 import { useNavigate } from "react-router-dom"
 import Button from "../../components/Button"
 import Input from "../../components/Input"
+import Swal from "sweetalert2"
 
 const LoginForm = () => {
     const [username, setUsername] = useState('')
@@ -18,9 +19,19 @@ const LoginForm = () => {
 
         try {
             await login(username, password)
-            navigate('/')
+            Swal.fire({
+                title: 'Bienvenido',
+                text: 'Inicio de sesión exitoso',
+                icon: 'success'
+            })
+            navigate('/Home')
         } catch (err) {
             setError(err.message)
+            Swal.fire({
+                title: 'Error',
+                text: 'Ha ocurrido un error, revisa tus credenciales',
+                icon: 'error'
+            })
         }
     }
 

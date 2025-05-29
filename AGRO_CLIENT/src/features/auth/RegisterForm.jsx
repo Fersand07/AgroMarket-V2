@@ -40,10 +40,10 @@ const RegisterForm = () => {
         e.preventDefault()
         setErrors({})
 
-        // if (!phoneRegex.test(phoneNumber)) {
-        //     setErrors({ phoneNumber: 'El número de teléfono no es válido' })
-        //     return
-        // }
+        if (!phoneRegex.test(phoneNumber)) {
+            setErrors({ phoneNumber: 'El número de teléfono no es válido' })
+            return
+        }
 
         if (password !== cPassword) {
             setErrors({ cPassword: 'Las contraseñas no coinciden' })

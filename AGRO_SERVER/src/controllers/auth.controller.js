@@ -6,6 +6,7 @@ export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
+    console.log(user)
     if (!user) {
       return res.status(403).json({ message: "User not found" });
     }
@@ -13,9 +14,10 @@ export const login = async (req, res) => {
     if (!passwordResponse) {
       return res.status(403).json({ message: "Password is incorrect" });
     }
-    const { token, expiresIn } = generateToken(user.id, user.role)
-    generateRefreshToken(user.id, user.role, res)
-    return res.status(200).json({ token, expiresIn });
+    const { token, expiresIn } = generateToken(user.id, user.role, user.username)
+    console.log(token)
+    generateRefreshToken(user.id, user.role, user.username, res)
+    return res.status(200).json({ token, expiresIn, message: "ok"});
 
   } catch (error) {
     res.status(500).json({ message: error.message });
