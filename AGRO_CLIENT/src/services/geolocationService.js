@@ -1,7 +1,7 @@
 
 //Este servicio nos retorna un json en base a las coordenadas que le mandemos, ejemplo de retorno
 
-//-> Banco Cuscatlan, av etc etc 
+//-> Banco Cuscatlan
 
 export const geolocationService = async (lat, lng) => {
     const response = await fetch(
@@ -18,5 +18,6 @@ export const geolocationService = async (lat, lng) => {
     }
 
     const data = await response.json()
+    
     return data.display_name // o data.address si quieres algo más detallado
 }

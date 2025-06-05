@@ -18,13 +18,22 @@ const LoginForm = () => {
         setError(null)
 
         try {
-            await login(username, password)
-            Swal.fire({
-                title: 'Bienvenido',
-                text: 'Inicio de sesión exitoso',
-                icon: 'success'
-            })
-            navigate('/Home')
+            const role = await login(username, password)
+            if(role === 'seller'){
+                Swal.fire({
+                    title: 'Bienvenido',
+                    text: 'Inicio de sesión exitoso como proveedor',
+                    icon: 'success'
+                })
+                navigate('/admin')
+            }else{
+                Swal.fire({
+                    title: 'Bienvenido',
+                    text: 'Inicio de sesión exitoso',
+                    icon: 'success'
+                })
+                navigate('/Home')
+            }
         } catch (err) {
             setError(err.message)
             Swal.fire({
