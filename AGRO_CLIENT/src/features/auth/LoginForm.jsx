@@ -3,6 +3,7 @@ import { useAuth } from "../../hooks/UseAuth"
 import { useNavigate } from "react-router-dom"
 import Button from "../../components/Button"
 import Input from "../../components/Input"
+import Swal from "sweetalert2"
 
 const LoginForm = () => {
     const [username, setUsername] = useState('')
@@ -17,10 +18,29 @@ const LoginForm = () => {
         setError(null)
 
         try {
-            await login(username, password)
-            navigate('/')
+            const role = await login(username, password)
+            if(role === 'seller'){
+                Swal.fire({
+                    title: 'Bienvenido',
+                    text: 'Inicio de sesión exitoso como proveedor',
+                    icon: 'success'
+                })
+                navigate('/admin')
+            }else{
+                Swal.fire({
+                    title: 'Bienvenido',
+                    text: 'Inicio de sesión exitoso',
+                    icon: 'success'
+                })
+                navigate('/Home')
+            }
         } catch (err) {
             setError(err.message)
+            Swal.fire({
+                title: 'Error',
+                text: 'Ha ocurrido un error, revisa tus credenciales',
+                icon: 'error'
+            })
         }
     }
 

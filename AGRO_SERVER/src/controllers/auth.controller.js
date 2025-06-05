@@ -6,6 +6,7 @@ export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
+    console.log(user)
     if (!user) {
       return res.status(403).json({ message: "User not found" });
     }
@@ -13,9 +14,10 @@ export const login = async (req, res) => {
     if (!passwordResponse) {
       return res.status(403).json({ message: "Password is incorrect" });
     }
-    const { token, expiresIn } = generateToken(user.id, user.role)
-    generateRefreshToken(user.id,  user.role,   res)
-    return res.status(200).json({ token, expiresIn });
+    const { token, expiresIn } = generateToken(user.id, user.role, user.username)
+    console.log(token)
+    generateRefreshToken(user.id, user.role, user.username, res)
+    return res.status(200).json({ token, expiresIn, message: "ok"});
 
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -23,7 +25,7 @@ export const login = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-  const { username, email, address, phone, password } = req.body;
+  const { username, email, address, phone, password, lat, lng } = req.body;
   try {
     const Usr = new User({
       username,
@@ -31,23 +33,25 @@ export const register = async (req, res) => {
       address,
       phone,
       password,
+      lat,
+      lng
     });
-    if(Usr.username||Usr.email||Usr.phone){
+    if (Usr.username || Usr.email || Usr.phone) {
       const phone = await User.findOne({ phone: Usr.phone });
       if (phone) {
         return res.status(403).json({ message: "Phone already in use" });
-    }
-    const user = await User
-      .findOne({ username: Usr.username });
-    if (user) {
-      return res.status(403).json({ message: "Username already in use" });
-    }
-    const email = await User
-      .findOne
-      ({ email: Usr.email });
-    if (email) {
-      return res.status(403).json({ message: "Email already in use" });
-    }
+      }
+      const user = await User
+        .findOne({ username: Usr.username });
+      if (user) {
+        return res.status(403).json({ message: "Username already in use" });
+      }
+      const email = await User
+        .findOne
+        ({ email: Usr.email });
+      if (email) {
+        return res.status(403).json({ message: "Email already in use" });
+      }
     }
 
 
@@ -67,7 +71,7 @@ export const register = async (req, res) => {
   }
 };
 
- 
+
 export const refreshToken = (req, res) => {
   try {
     const refreshTokenCookie = req.cookies.refreshToken
@@ -82,10 +86,10 @@ export const refreshToken = (req, res) => {
       "Invalid signature": "La firma del JWT no es valido",
       "jwt expired": "JWT expirado",
       "invalid token": "Token no valido",
-      "No bearer": "Utiliza el formato bearer",  
-      "jwt malformed": "JWT mal formado" 
+      "No bearer": "Utiliza el formato bearer",
+      "jwt malformed": "JWT mal formado"
     };
-    return res.status(401).json({message: tokenVerificationErrors[e.message] || e.message});
+    return res.status(401).json({ message: tokenVerificationErrors[e.message] || e.message });
   }
 };
 
