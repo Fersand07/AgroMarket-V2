@@ -30,10 +30,6 @@ const productSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'MeasureUnit'
     },
-    image:{
-        type: String,
-        required: false
-    },
     measurement: {
         type: Schema.Types.ObjectId,
         ref: 'Measurement'

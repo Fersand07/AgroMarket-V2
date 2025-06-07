@@ -22,12 +22,12 @@ const Navbar = ({ onMenuClick }) => {
         />
       </div>
 
-      <div className="flex items-center bg-green-900 px-4 py-2 rounded-full w-full max-w-md">
+      <div className="flex items-center bg-primaryAltDark px-4 py-2 rounded-full w-full max-w-md">
         <Search className="text-white mr-2" />
         <input
           type="text"
           placeholder="BUSCAR"
-          className="bg-transparent outline-none text-white placeholder-white w-full"
+          className="bg-transparent outline-none font-poppins font-semibold text-white  placeholder-white w-full"
         />
       </div>
 

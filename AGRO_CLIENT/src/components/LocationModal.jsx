@@ -1,6 +1,8 @@
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { geolocationService } from '../services/geolocationService'
+import markerImg from '../assets/marker.svg'
+import L from 'leaflet'
 
 // Componente para manejar marcador interactivo
 function LocationPicker({ position, setPosition }) {
@@ -10,8 +12,16 @@ function LocationPicker({ position, setPosition }) {
         }
     })
 
+    const customMarkerIcon = L.icon({
+        iconUrl: markerImg,
+        iconSize: [30, 40],       // Ajusta al tamaño de tu imagen
+        iconAnchor: [15, 40],     // Punta inferior del marcador
+        popupAnchor: [0, -40],    // Si usas popups (opcional)
+    });
+
     return (
         <Marker
+            icon={customMarkerIcon}
             position={position}
             draggable={true}
             eventHandlers={{

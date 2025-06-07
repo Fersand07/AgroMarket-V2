@@ -107,7 +107,7 @@ const RegisterForm = () => {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   required
-                  className="pr-10 w-full h-25 resize-none border rounded px-3 py-2 bg-white text-black"
+                  className="pr-10 w-full h-25 resize-none border border-gray-300 rounded px-3 py-2 bg-altBgColor text-black"
                 />
                 <button
                   type="button"
