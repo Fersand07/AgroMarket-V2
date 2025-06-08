@@ -26,7 +26,8 @@ const Home = () => {
           typeof p.name === 'string' && p.name.trim() !== '' &&
           typeof p.price === 'number' &&
           typeof p.description === 'string' && p.description.trim() !== '' &&
-          typeof p.image === 'string' && p.image.trim() !== ''
+          typeof p.image === 'string' && p.image.trim() !== '' &&
+          p.category && typeof p.category.name === 'string' && p.category.name.trim() !== ''
         );
 
         console.log("Productos válidos después del filtro:", validProducts);
@@ -43,12 +44,12 @@ const Home = () => {
 
   // Revisar logica de esto por la categorias 
   const categories = ['Todos', ...new Set(products
-  .filter(p => p.category && p.category)
-  .map(p => p.category))];
+  .filter(p => p.category && p.category.name)
+  .map(p => p.category.name))];
 
   const filtered = selectedCategory === 'Todos'
     ? products
-    : products.filter(p => p.category === selectedCategory);
+    : products.filter(p => p.category.name === selectedCategory);
 
   
   const sorted = [...filtered].sort((a, b) => {
