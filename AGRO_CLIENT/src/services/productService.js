@@ -15,3 +15,15 @@ export const getProducts = async () => {
     throw error;
   }
 };
+
+export const getProductById = async (id) => {
+  try {
+    const response = await fetch(`${API_URL}/products/${id}`);
+    const data = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error('Erroe al obtener el producto', error);
+    throw error;
+  }
+}
