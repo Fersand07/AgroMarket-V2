@@ -3,6 +3,7 @@ import ProductGrid from '../features/products/ProductGrid';
 import Pagination from '../components/Pagination';
 import TopControls from '../features/products/TopControls';
 import { getProducts } from '../services/productService';
+import ProductCreateModal from '../features/products/ProductModal';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -12,6 +13,9 @@ const Home = () => {
 
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [sortValue, setSortValue] = useState('name-asc');
+
+  //Modal start value
+  const [showModal, setShowModal] = useState(false);
 
 
   useEffect(() => {
@@ -67,7 +71,15 @@ const Home = () => {
 
 
   return (
+
+    
     <div className="px-32 py-4">
+      <button
+        onClick={() => setShowModal(true)}
+        className="mb-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Crear nuevo producto
+      </button>
 
       <TopControls
         selectedCategory={selectedCategory}
@@ -84,6 +96,12 @@ const Home = () => {
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
+
+        {showModal && (
+          <ProductCreateModal
+            onClose={() => setShowModal(false)}
+          />
+        )}
     </div>
   );
 };
