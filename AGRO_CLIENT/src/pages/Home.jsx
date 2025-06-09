@@ -6,10 +6,8 @@ import { getProducts } from '../services/productService';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(12);
-
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [sortValue, setSortValue] = useState('name-asc');
 
@@ -18,20 +16,14 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const data = await getProducts();
-
-        console.log("Productos crudos desde API:", data.products);
-
         const validProducts = data.products.filter(p =>
           p &&
-          typeof p.name === 'string' && p.name.trim() !== '' &&
+          typeof p.name === 'string' &&
           typeof p.price === 'number' &&
-          typeof p.description === 'string' && p.description.trim() !== '' &&
-          typeof p.image === 'string' && p.image.trim() !== '' &&
-          p.category && typeof p.category.name === 'string' && p.category.name.trim() !== ''
+          typeof p.description === 'string' &&
+          typeof p.image === 'string' &&
+          p.category && typeof p.category.name === 'string'
         );
-
-        console.log("Productos válidos después del filtro:", validProducts);
-
         setProducts(validProducts);
       } catch (error) {
         console.error('No se pudo cargar los productos', error);
@@ -41,17 +33,11 @@ const Home = () => {
     fetchData();
   }, []);
 
-
-  // Revisar logica de esto por la categorias 
-  const categories = ['Todos', ...new Set(products
-  .filter(p => p.category && p.category.name)
-  .map(p => p.category.name))];
-
+  const categories = ['Todos', ...new Set(products.map(p => p.category?.name).filter(Boolean))];
   const filtered = selectedCategory === 'Todos'
     ? products
     : products.filter(p => p.category.name === selectedCategory);
 
-  
   const sorted = [...filtered].sort((a, b) => {
     if (sortValue === 'name-asc') return a.name.localeCompare(b.name);
     if (sortValue === 'name-desc') return b.name.localeCompare(a.name);
@@ -60,15 +46,12 @@ const Home = () => {
     return 0;
   });
 
-  
   const totalPages = Math.ceil(sorted.length / perPage);
   const start = (currentPage - 1) * perPage;
   const currentProducts = sorted.slice(start, start + perPage);
 
-
   return (
-    <div className="px-32 py-4">
-
+    <div className="px-4 sm:px-10 md:px-32 py-4">
       <TopControls
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
@@ -77,13 +60,15 @@ const Home = () => {
         categories={categories}
       />
 
-      <ProductGrid products={currentProducts} />
+      
+      <ProductGrid products={currentProducts}  />
 
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
+
     </div>
   );
 };

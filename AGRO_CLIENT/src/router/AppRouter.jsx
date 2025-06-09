@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 import { PrivateRoute } from './PrivateRoute';
 
 
+
 const AppRouter = () => {
   return (
     <BrowserRouter>
@@ -19,6 +20,7 @@ const AppRouter = () => {
           <Route path="/home" element={ <PrivateRoute roleRequired={'user'}>
             <Home />
           </PrivateRoute>} />
+          
           
         </Route>
       </Routes>
