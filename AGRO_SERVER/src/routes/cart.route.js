@@ -17,7 +17,7 @@ router.post(
     addToCart 
 );
 
-router.post(
+router.delete(
     '/remove',
     [
         body('productId', 'Product ID is required').not().isEmpty(),
