@@ -8,11 +8,11 @@ const Login = () => {
         <div className="flex flex-row">
             <div className=" flex flex-col justify-center items-center gap-14 w-2xl login-container bg-primaryColor">
                 <div className="w-48 h-48 bg-altBgColor rounded-full">
-                    <img  src={Logo} />
+                    <img alt="Logo"  src={Logo} />
                 </div>
                 <LoginForm/>
             </div>
-            <img  className="h-screen" src={bgImage}/>
+            <img  className="h-screen" src={bgImage} alt="backgroundImage"/>
         </div>
     )
 }

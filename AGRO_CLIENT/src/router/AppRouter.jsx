@@ -4,6 +4,7 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Home from '../pages/Home';
 import { PrivateRoute } from './PrivateRoute';
+import UserProfile from '../features/profile/Userprofile';
 
 
 
@@ -20,8 +21,10 @@ const AppRouter = () => {
           <Route path="/home" element={ <PrivateRoute roleRequired={'user'}>
             <Home />
           </PrivateRoute>} />
-          
-          
+          <Route path="/profile" element={ <PrivateRoute roleRequired={'user'}>
+            <UserProfile />
+          </PrivateRoute>} />
+                
         </Route>
       </Routes>
     </BrowserRouter>

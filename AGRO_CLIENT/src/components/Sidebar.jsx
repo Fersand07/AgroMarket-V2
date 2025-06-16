@@ -31,7 +31,7 @@ const Sidebar = () => {
         </li>
         <li
           className="flex items-center gap-3 text-white hover:text-black hover:bg-green-700 cursor-pointer p-2 rounded transition-colors"
-          onClick={() => navigate('/perfil')}
+          onClick={() => navigate('/profile')}
         >
           <User size={20} />
           <span>Perfil</span>
