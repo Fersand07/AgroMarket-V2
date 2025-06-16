@@ -12,7 +12,7 @@ const Login = () => {
                 </div>
                 <LoginForm/>
             </div>
-            <img  className="h-screen" src={bgImage} alt="backgroundImage"/>
+            <img  className="h-screen" src={bgImage} alt=""/>
         </div>
     )
 }

@@ -33,6 +33,10 @@ export async function updateUser(updatedData) {
 
   const token = localStorage.getItem("token")
 
+  if (!token) {
+    throw new Error("Token no encontrado");
+  }
+
   try {
     const res = await fetch(`${API_URL}/profile/update`, {
       method: 'PATCH',
