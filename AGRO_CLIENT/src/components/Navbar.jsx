@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { User, ShoppingCart, Menu, Search } from 'lucide-react';
+import { User, ShoppingCart, Menu, Search, House } from 'lucide-react';
 import logo from '../assets/logo.png';
 
 const Navbar = ({ onMenuClick }) => {
@@ -8,9 +8,13 @@ const Navbar = ({ onMenuClick }) => {
   return (
     <nav className="bg-green-800 text-white p-4 flex items-center justify-between">
       <div className="flex items-center gap-6">
+        <House
+          className='cursor-pointer hover:scale-110'
+          onClick={() => navigate("/home")}
+        />
         <User
           className="cursor-pointer hover:scale-110"
-          onClick={() => navigate('/perfil')}
+          onClick={() => navigate('/profile')}
         />
         <ShoppingCart
           className="cursor-pointer hover:scale-110"
