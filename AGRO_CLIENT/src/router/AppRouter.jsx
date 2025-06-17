@@ -5,6 +5,7 @@ import Register from '../pages/Register';
 import Home from '../pages/Home';
 import { PrivateRoute } from './PrivateRoute';
 import UserProfile from '../features/profile/Userprofile';
+import Cart from '../features/cart/Cart';
 
 
 
@@ -24,7 +25,9 @@ const AppRouter = () => {
           <Route path="/profile" element={ <PrivateRoute roleRequired={'user'}>
             <UserProfile />
           </PrivateRoute>} />
-                
+          <Route path='/cart' element={ <PrivateRoute roleRequired={'user'}>
+            <Cart />
+          </PrivateRoute>} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,7 +1,37 @@
+import { useState } from "react";
+import Button from "../../components/Button";
+import { addToCart } from "../../services/CartService";
+import Swal from "sweetalert2";
 
 const ModalProductDetail = ({ product, isOpen, onClose }) => {
-  if (!isOpen || !product) return null;
 
+  const [quantity, setQuantity] = useState();
+
+  const handleAddToCart = async () => {
+    if(!quantity || quantity < 1) return;
+
+    try {
+      await addToCart(product._id, quantity);
+      console.log('Producto agregado exitosamente');
+      Swal.fire({
+        title: "Producto agregado al carrito",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1250 
+      })
+      onClose();
+    } catch (error) {
+      console.error("Error al agregar al carrito", error)
+      Swal.fire({
+        title: "No ha sido posible agregar el producto",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 1250
+      })
+    }
+  }
+
+  if (!isOpen || !product) return null;
   return (
     <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)]  flex items-center justify-center z-50">
       <div className="bg-white rounded-lg  p-6 w-full max-w-xl relative shadow-md">
@@ -38,16 +68,15 @@ const ModalProductDetail = ({ product, isOpen, onClose }) => {
               <input
                 type="number"
                 min="1"
+                value={quantity}
                 defaultValue={1}
+                onChange={(e) =>  setQuantity(e.target.value)}
                 className="border rounded px-2 py-1 w-20"
                 id="quantityInput"
               />
-              <button
-                className="bg-primaryColor text-white px-4 py-2 rounded hover:bg-primaryAltDark"
-                // TODO: logica de añadir al carrito
-              >
+              <Button onClick={handleAddToCart}>
                 Agregar al carrito
-              </button>
+              </Button>
             </div>
           </div>
         </div>
