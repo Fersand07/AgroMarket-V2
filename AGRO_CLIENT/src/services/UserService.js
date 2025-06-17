@@ -21,7 +21,7 @@ export const getUserInfo = async () => {
     }
 
     const data = await response.json();
-    return data; // normalmente será { user: { ... } }
+    return data; 
   } catch (error) {
     console.error("Error al obtener la información del usuario:", error);
     throw error;

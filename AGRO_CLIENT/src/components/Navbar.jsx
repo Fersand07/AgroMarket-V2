@@ -18,7 +18,7 @@ const Navbar = ({ onMenuClick }) => {
         />
         <ShoppingCart
           className="cursor-pointer hover:scale-110"
-          onClick={() => navigate('/carrito')}
+          onClick={() => navigate('/cart')}
         />
         <Menu
           className="cursor-pointer hover:scale-110"
