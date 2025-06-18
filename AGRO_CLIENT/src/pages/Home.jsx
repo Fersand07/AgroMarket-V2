@@ -3,6 +3,7 @@ import ProductGrid from '../features/products/ProductGrid';
 import Pagination from '../components/Pagination';
 import TopControls from '../features/products/TopControls';
 import { getProducts } from '../services/productService';
+import ProductCreateModal from '../features/products/ProductModal';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
