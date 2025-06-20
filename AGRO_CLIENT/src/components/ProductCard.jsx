@@ -1,9 +1,9 @@
-import { useAuth } from "../hooks/UseAuth";
+import { useMemo } from "react";
 import Button from "./Button";
 
 const ProductCard = ({ product,  onViewDetails}) => {
 
-    const role = localStorage.getItem('role')
+    const role = useMemo(() => localStorage.getItem('role'), [])
     
     const truncateText = (text, maxLength ) => {
         if (!text) return '';

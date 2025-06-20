@@ -15,26 +15,35 @@ const SellerHome = () => {
 
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getProductsPostedByUser();
-        const validProducts = data.products.filter(p =>
-          p &&
-          typeof p.name === 'string' &&
-          typeof p.price === 'number' &&
-          typeof p.description === 'string' &&
-          typeof p.image === 'string' &&
-          p.category && typeof p.category.name === 'string'
-        );
-        setProducts(validProducts);
-      } catch (error) {
-        console.error('No se pudo cargar los productos', error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const data = await getProductsPostedByUser();
+      const validProducts = data.products.filter(p =>
+        p &&
+        typeof p.name === 'string' &&
+        typeof p.price === 'number' &&
+        typeof p.description === 'string' &&
+        typeof p.image === 'string' &&
+        p.category && typeof p.category.name === 'string'
+      );
+      setProducts(validProducts);
+    } catch (error) {
+      console.error('No se pudo cargar los productos', error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }, []);
+  }, []); 
+
+  const handleProductModalClose = () => {
+    fetchData();
+  }
+
+  const handleCreateProductModalClose = () => {
+    fetchData();
+    setShowModal(false)
+  }
 
   const categories = ['Todos', ...new Set(products.map(p => p.category?.name).filter(Boolean))];
   const filtered = selectedCategory === 'Todos'
@@ -66,7 +75,10 @@ const SellerHome = () => {
       />
 
       
-      <ProductGrid products={currentProducts}  />
+      <ProductGrid 
+        products={currentProducts}
+        onProductModalClose={handleProductModalClose}  
+      />
 
       <Pagination
         currentPage={currentPage}
@@ -75,7 +87,7 @@ const SellerHome = () => {
       />
       {showModal && (
           <ProductCreateModal
-            onClose={() => setShowModal(false)}
+            onClose={handleCreateProductModalClose}
           />
        )}
     </div>

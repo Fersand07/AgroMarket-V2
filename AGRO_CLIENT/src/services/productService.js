@@ -63,6 +63,25 @@ export const getProductsPostedByUser = async () => {
     return data; 
 }
 
+export const updateProduct = async (productId, updatedData) => {
+  const token = localStorage.getItem('token');
+
+  const response = await fetch(`${API_URL}/products/update/${productId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(updatedData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error al crear el producto');
+  }
+
+  return await response.json();
+}
 
 
 

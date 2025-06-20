@@ -3,6 +3,8 @@ import { getCategories, getMeasureUnits } from '../../services/categoryService';
 import { createProductService } from '../../services/productService';
 import { uploadImage } from '../../helpers/cloudinary';
 import Swal from "sweetalert2";
+import Button from '../../components/Button';
+import { ImagePlus } from 'lucide-react';
 
 const ProductCreateModal = ({ onClose }) => {
   const [form, setForm] = useState({
@@ -150,9 +152,9 @@ const ProductCreateModal = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/20 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 backdrop-blur-sm font-poppins bg-black/20 flex items-center justify-center">
       <div className="w-[400px] bg-white rounded-md overflow-hidden shadow-lg">
-        <div className="bg-green-800 text-white text-center py-3 text-lg font-semibold">
+        <div className="bg-primaryColor text-white text-center py-3 text-lg font-semibold">
           Información del Producto
         </div>
 
@@ -164,11 +166,10 @@ const ProductCreateModal = ({ onClose }) => {
             {previewUrl ? (
               <img src={previewUrl} alt="preview" className="max-h-full object-contain" />
             ) : (   
-              <span className="text-gray-600 text-center text-sm">
-                <span className="text-4xl font-bold">+</span>
-                <br />
-                Agregar imagen
-              </span>
+              <div className="text-gray-600 text-sm flex flex-col items-center justify-center text-center">
+                <ImagePlus style={{ width: '2em', height: '2em' }} />
+                <span>Agregar imagen</span>
+              </div>
             )}
           </label>
           <input
@@ -252,19 +253,19 @@ const ProductCreateModal = ({ onClose }) => {
           />
 
           <div className="flex justify-between mt-4">
-            <button
+            <Button
               onClick={onClose}
-              className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
+              variant='secondary'
             >
               CANCELAR
-            </button>
-            <button
+            </Button>
+            <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className={`px-6 py-2 rounded text-white ${isSubmitting ? 'bg-green-300 cursor-not-allowed' : 'bg-green-800 hover:bg-green-900'}`}
+                className={`${isSubmitting ? 'bg-green-300 cursor-not-allowed' : 'bg-primaryColor'}`}
                 >
                 {isSubmitting ? 'Procesando...' : 'SIGUIENTE'}
-                </button>
+                </Button>
 
           </div>
         </div>

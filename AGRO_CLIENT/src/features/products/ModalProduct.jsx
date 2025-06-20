@@ -2,6 +2,7 @@ import { useState } from "react";
 import Button from "../../components/Button";
 import { addToCart } from "../../services/CartService";
 import Swal from "sweetalert2";
+import {  XCircle } from "lucide-react";
 
 const ModalProductDetail = ({ product, isOpen, onClose }) => {
 
@@ -37,9 +38,9 @@ const ModalProductDetail = ({ product, isOpen, onClose }) => {
       <div className="bg-white rounded-lg  p-6 w-full max-w-xl relative shadow-md">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
+          className="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-xl"
         >
-          &times;
+          <XCircle/>
         </button>
 
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">

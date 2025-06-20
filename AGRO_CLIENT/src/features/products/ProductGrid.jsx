@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ProductCard from "../../components/ProductCard";
 import ModalProductDetail from "./ModalProduct";
+import ModalEditProduct from "./ModalEditProduct";
 
-const ProductGrid = ({ products }) => {
+const ProductGrid = ({ products, onProductModalClose }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const role = useMemo(() => localStorage.getItem('role'), [])
+  const isSeller = role === 'seller'
 
   const handleViewDetails = (product) => {
     setSelectedProduct(product);
@@ -14,6 +18,7 @@ const ProductGrid = ({ products }) => {
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedProduct(null);
+    onProductModalClose?.()
   };
 
   return (
@@ -34,11 +39,21 @@ const ProductGrid = ({ products }) => {
         )}
       </div>
 
-      <ModalProductDetail
-        product={selectedProduct}
-        isOpen={modalOpen}
-        onClose={handleCloseModal}
-      />
+      {
+        isSeller ? (
+          <ModalEditProduct
+            product={selectedProduct}
+            isOpen={modalOpen}
+            onClose={handleCloseModal}
+          />
+        ) : (
+          <ModalProductDetail
+            product={selectedProduct}
+            isOpen={modalOpen}
+            onClose={handleCloseModal}
+          />
+        )
+      }
     </>
   );
 };
