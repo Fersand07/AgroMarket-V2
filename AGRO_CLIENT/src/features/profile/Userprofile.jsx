@@ -139,6 +139,8 @@ const UserProfile = () => {
 
   if (!user) return <p>Cargando usuario...</p>;
 
+  const isSeller = user.role === 'seller';
+
   return (
     <div className="max-w-4xl mx-auto font-poppins bg-white shadow-lg rounded-lg overflow-hidden">
       <div className="h-48 bg-gradient-to-r from-primaryColor to-primaryAltDark relative">
@@ -275,7 +277,7 @@ const UserProfile = () => {
             </form>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className={`grid grid-cols-1 gap-6 mb-6 ${isSeller ? 'md:grid-cols-1' : 'md:grid-cols-2'} `}>
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="font-semibold text-gray-700 mb-2">Información de contacto</h3>
               <div className="space-y-2">
@@ -285,14 +287,20 @@ const UserProfile = () => {
               </div>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-700 mb-2">Información de cuenta</h3>
-              <div className="space-y-2">
-                <p className="text-gray-600">
-                  <span className="font-medium">Créditos:</span> ${user.credit?.toFixed(2) || "0.00"}
-                </p>
+          {
+            isSeller ? (
+              null
+            ) : (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-700 mb-2">Información de cuenta</h3>
+                <div className="space-y-2">
+                  <p className="text-gray-600">
+                    <span className="font-medium">Créditos:</span> ${user.credit?.toFixed(2) || "0.00"}
+                  </p>
+                </div>
               </div>
-            </div>
+            )
+          }  
           </div>
         )}
       </div>

@@ -25,7 +25,7 @@ const LoginForm = () => {
                     text: 'Inicio de sesión exitoso como proveedor',
                     icon: 'success'
                 })
-                navigate('/admin')
+                navigate('/seller/home')
             }else{
                 Swal.fire({
                     title: 'Bienvenido',

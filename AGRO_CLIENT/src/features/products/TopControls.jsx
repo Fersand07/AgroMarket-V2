@@ -1,4 +1,9 @@
-const TopControls = ({ selectedCategory, setSelectedCategory, sortValue, setSortValue, categories }) => {
+import Button from "../../components/Button";
+
+const TopControls = ({ selectedCategory, setSelectedCategory, sortValue, setSortValue, categories, setShowModal }) => {
+
+  const role = localStorage.getItem("role");
+
   return (
     <div className="flex flex-wrap justify-between font-poppins items-center mb-6 gap-4">
       <div>
@@ -27,6 +32,7 @@ const TopControls = ({ selectedCategory, setSelectedCategory, sortValue, setSort
           <option value="price-desc">Precio mayor</option>
         </select>
       </div>
+      { role === 'seller' ? <Button className="bg-primaryColor" onClick={() => setShowModal(true)}>Crear nuevo Producto</Button> : null}
     </div>
   );
 };

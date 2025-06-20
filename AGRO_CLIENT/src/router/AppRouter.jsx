@@ -2,10 +2,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
-import Home from '../pages/Home';
+import Home from '../pages/HomeUser';
 import { PrivateRoute } from './PrivateRoute';
 import UserProfile from '../features/profile/Userprofile';
 import Cart from '../features/cart/Cart';
+import SellerHome from '../pages/SellerHome';
 
 
 
@@ -22,11 +23,17 @@ const AppRouter = () => {
           <Route path="/home" element={ <PrivateRoute roleRequired={'user'}>
             <Home />
           </PrivateRoute>} />
-          <Route path="/profile" element={ <PrivateRoute roleRequired={'user'}>
-            <UserProfile />
-          </PrivateRoute>} />
           <Route path='/cart' element={ <PrivateRoute roleRequired={'user'}>
             <Cart />
+          </PrivateRoute>} />
+
+          <Route path="/seller/home" element={ <PrivateRoute roleRequired={'seller'}>
+            <SellerHome />
+          </PrivateRoute> } />
+
+
+          <Route path="/profile" element={ <PrivateRoute roleRequired={['user', 'seller']}>
+            <UserProfile />
           </PrivateRoute>} />
         </Route>
       </Routes>

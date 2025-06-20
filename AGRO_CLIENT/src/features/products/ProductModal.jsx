@@ -9,7 +9,7 @@ const ProductCreateModal = ({ onClose }) => {
     name: '',
     description: '',
     category: '',
-    measureUnit: '',
+    measureUnit: 'Lb',
     quantity: '',
     price: '',
     stock: '',
@@ -114,6 +114,7 @@ const ProductCreateModal = ({ onClose }) => {
         text: 'Verifica tu conexión o intenta nuevamente.',
       });
       setIsSubmitting(false);
+      console.error(err)
       return;
     }
 

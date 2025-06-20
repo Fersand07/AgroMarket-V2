@@ -45,6 +45,24 @@ export const createProductService = async (productData, token) => {
   return await response.json();
 };
 
+export const getProductsPostedByUser = async () => {
+  const token = localStorage.getItem('token');
+
+    const response = await fetch(`${API_URL}/products/user/ownProducts`, {
+      headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data; 
+}
+
 
 
 
