@@ -27,3 +27,61 @@ export const getProductById = async (id) => {
     throw error;
   }
 }
+export const createProductService = async (productData, token) => {
+  const response = await fetch(`${API_URL}/products/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(productData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error al crear el producto');
+  }
+
+  return await response.json();
+};
+
+export const getProductsPostedByUser = async () => {
+  const token = localStorage.getItem('token');
+
+    const response = await fetch(`${API_URL}/products/user/ownProducts`, {
+      headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data; 
+}
+
+export const updateProduct = async (productId, updatedData) => {
+  const token = localStorage.getItem('token');
+
+  const response = await fetch(`${API_URL}/products/update/${productId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(updatedData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error al crear el producto');
+  }
+
+  return await response.json();
+}
+
+
+

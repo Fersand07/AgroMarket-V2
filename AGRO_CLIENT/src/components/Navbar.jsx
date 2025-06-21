@@ -1,8 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { User, ShoppingCart, Menu, Search, House } from 'lucide-react';
 import logo from '../assets/logo.png';
+import { useMemo } from 'react';
 
 const Navbar = ({ onMenuClick }) => {
+
+  const role = useMemo(() => localStorage.getItem('role'), []);  
+
+  const isSeller = role === "seller";
+
   const navigate = useNavigate();
 
   return (
@@ -10,16 +16,15 @@ const Navbar = ({ onMenuClick }) => {
       <div className="flex items-center gap-6">
         <House
           className='cursor-pointer hover:scale-110'
-          onClick={() => navigate("/home")}
+          onClick={() => navigate(isSeller ? "seller/home" : "/home")}
         />
         <User
           className="cursor-pointer hover:scale-110"
           onClick={() => navigate('/profile')}
         />
-        <ShoppingCart
-          className="cursor-pointer hover:scale-110"
-          onClick={() => navigate('/cart')}
-        />
+        {
+          isSeller ? null : <ShoppingCart className="cursor-pointer hover:scale-110" onClick={() => navigate('/cart')} /> 
+        }
         <Menu
           className="cursor-pointer hover:scale-110"
           onClick={onMenuClick}

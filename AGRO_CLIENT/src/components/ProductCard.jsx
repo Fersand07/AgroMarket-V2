@@ -1,17 +1,16 @@
-import { useAuth } from "../hooks/UseAuth";
+import { useMemo } from "react";
 import Button from "./Button";
 
 const ProductCard = ({ product,  onViewDetails}) => {
 
-
-    const { user } = useAuth();
+    const role = useMemo(() => localStorage.getItem('role'), [])
     
     const truncateText = (text, maxLength ) => {
         if (!text) return '';
         return text.length > maxLength ? text.slice(0, maxLength - 2) + '...' : text;
     }
 
-    const isSeller = user?.role ==="seller";
+    const isSeller = role ==="seller";
 
     return (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden max-w-sm">
