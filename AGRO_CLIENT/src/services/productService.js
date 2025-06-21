@@ -77,7 +77,7 @@ export const updateProduct = async (productId, updatedData) => {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || 'Error al crear el producto');
+    throw new Error(errorData.message || 'Error al actualizar el producto');
   }
 
   return await response.json();

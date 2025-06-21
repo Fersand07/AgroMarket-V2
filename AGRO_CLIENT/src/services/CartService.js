@@ -91,7 +91,7 @@ export const updateCart = async (items) => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error en removeCart:", error.message);
+        console.error("Error en updateCart:", error.message);
         throw error;
     }     
 } 

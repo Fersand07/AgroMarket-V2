@@ -1,13 +1,16 @@
 import { useNavigate } from 'react-router-dom';
-import { User, ShoppingCart, Menu, Search, House } from 'lucide-react';
+import { User, ShoppingCart, Menu, Search, House, LogOut } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { useMemo } from 'react';
+import { useAuth } from '../hooks/UseAuth';
 
-const Navbar = ({ onMenuClick }) => {
+const Navbar = () => {
 
   const role = useMemo(() => localStorage.getItem('role'), []);  
 
   const isSeller = role === "seller";
+
+  const { logout } = useAuth()
 
   const navigate = useNavigate();
 
@@ -16,7 +19,7 @@ const Navbar = ({ onMenuClick }) => {
       <div className="flex items-center gap-6">
         <House
           className='cursor-pointer hover:scale-110'
-          onClick={() => navigate(isSeller ? "seller/home" : "/home")}
+          onClick={() => navigate(isSeller ? "/seller/home" : "/home")}
         />
         <User
           className="cursor-pointer hover:scale-110"
@@ -25,9 +28,9 @@ const Navbar = ({ onMenuClick }) => {
         {
           isSeller ? null : <ShoppingCart className="cursor-pointer hover:scale-110" onClick={() => navigate('/cart')} /> 
         }
-        <Menu
-          className="cursor-pointer hover:scale-110"
-          onClick={onMenuClick}
+        <LogOut 
+          className='cursor-pointer hover:scale-110'
+          onClick={() => logout()}
         />
       </div>
 
