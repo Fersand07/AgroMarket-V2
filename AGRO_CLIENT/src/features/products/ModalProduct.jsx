@@ -6,7 +6,7 @@ import {  XCircle } from "lucide-react";
 
 const ModalProductDetail = ({ product, isOpen, onClose }) => {
 
-  const [quantity, setQuantity] = useState();
+  const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = async () => {
     if(!quantity || quantity < 1) return;

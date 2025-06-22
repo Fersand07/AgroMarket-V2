@@ -27,6 +27,13 @@ const ProductCard = ({ product,  onViewDetails}) => {
             <h2 className="text-black text-base">{product.name}</h2>
             <p className="text-gray-500 text-xs">{truncateText(product.description, 58)}</p>
             <p className="text-black text-base">${product.price}</p>
+            {
+                isSeller ? (
+                    <p className="text-black text-base">stock: {product.stock} {product.measureUnit.name}</p>
+                ) : (
+                    null
+                )
+            }
         </div> 
         <div className="max-w-sm mb-2  flex justify-center">
             <Button className="bg-primaryColor hover:bg-primaryAltDark" onClick={() => onViewDetails(product)}>
