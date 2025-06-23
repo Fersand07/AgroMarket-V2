@@ -1,5 +1,5 @@
 import { ShoppingCart } from '../models/shoppingCart.js';
-import { Product } from '../models/Product.js';
+import { Product } from '../models/product.js';
 import jwt from 'jsonwebtoken';
 
 export const getCart = async (req, res) => {
