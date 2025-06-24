@@ -1,4 +1,4 @@
-import {Product} from  '../models/Product.js'
+import {Product} from  '../models/product.js'
 import {MeasureUnit} from  '../models/measureUnit.js'
 import {Category} from  '../models/productCategory.js'
 import {User} from  '../models/user.js'

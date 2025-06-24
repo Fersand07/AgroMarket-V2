@@ -1,5 +1,5 @@
 import { Category } from '../models/productCategory.js'
-import { Product } from '../models/Product.js'
+import { Product } from '../models/product.js'
 import { MeasureUnit } from '../models/measureUnit.js'
 
 export const uploadDataForCategories = async (req, res) => {
