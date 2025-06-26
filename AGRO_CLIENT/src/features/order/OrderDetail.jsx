@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Clock, Route, Package, User, ShoppingBag } from 'lucide-react';
-import { useParams } from 'react-router-dom';
-import { getOrderById } from '../../services/OrderService';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getOrderById, updateOrderStatus } from '../../services/OrderService';
+import Button from '../../components/Button'
 
 const OrderDetail = () => {
   const mapRef = useRef(null);
@@ -24,6 +25,7 @@ const OrderDetail = () => {
       setLoading(false);
     }
   }, [id]);
+
 
   useEffect(() => {
     fetchOrder();
@@ -92,6 +94,79 @@ const OrderDetail = () => {
 
   const formatDistance = (meters) => {
     return meters >= 1000 ? `${(meters / 1000).toFixed(1)} km` : `${meters} m`;
+  };
+
+  const navigate = useNavigate();
+
+  const handleOrderStatus = async (status) => {
+    try {
+      await updateOrderStatus(id, status);
+      if (status === 'completed') {
+        navigate('/orders'); 
+        return;
+      }
+
+      fetchOrder();
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const renderActionButton = () => {
+    const currentStatus = orderData?.status;
+
+    if (isSeller) {
+      if (currentStatus === 'pending') {
+        return (
+          <Button 
+            onClick={() => handleOrderStatus('in_progress')} 
+            className='bg-primaryColor hover:bg-primaryColor/90'
+          >
+            Enviar pedido
+          </Button>
+        );
+      } else {
+        return (
+          <Button 
+            variant='secondary'
+            disabled={true}
+            className='cursor-not-allowed hover:cursor-not-allowed'
+          >
+            Pedido ya enviado
+          </Button>
+        );
+      }
+    } else {
+      if (currentStatus === 'pending') {
+        return (
+          <Button 
+            onClick={() => handleOrderStatus('cancelled')} 
+            className='bg-red-800 hover:bg-red-700'
+          >
+            Cancelar pedido
+          </Button>
+        );
+      } else if (currentStatus === 'in_progress') {
+        return (
+          <Button 
+            onClick={() => handleOrderStatus('completed')} 
+            className='bg-primaryColor'
+          >
+            Pedido recibido
+          </Button>
+        );
+      } else {
+        return (
+          <Button 
+            className='cursor-not-allowed hover:cursor-not-allowed' 
+            variant='secondary'
+            disabled
+          >
+            {currentStatus === 'completed' ? 'Pedido completado' : 'Pedido cancelado'}
+          </Button>
+        );
+      }
+    }
   };
 
   if (loading || !orderData) {
@@ -267,7 +342,10 @@ const OrderDetail = () => {
             </div>
           </div>
         )}
+      </div>
 
+      <div className='flex justify-center mt-6'>
+        {renderActionButton()}
       </div>
     </div>
   );
