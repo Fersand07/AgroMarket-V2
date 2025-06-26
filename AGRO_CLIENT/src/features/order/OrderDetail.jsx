@@ -232,7 +232,7 @@ const OrderDetail = () => {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Cantidad de productos:</span>
-              <span className="font-medium">{order.items[0]?.quantity} unidades</span>
+              <span className="font-medium">{order.items?.reduce((total, item) => total + item.quantity, 0)} unidades</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Creado:</span>
