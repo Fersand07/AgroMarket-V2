@@ -2,10 +2,13 @@ import { Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Button from "../../components/Button";
 import { getCart, removeFromCart, updateCart } from "../../services/CartService";
+import { createOrder } from "../../services/OrderService";
+import Swal from "sweetalert2";
 
 const Cart = () => {
     const [items, setItems] = useState([]);
     const updateTimeoutRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     const fetchCart = async () => {
         try {
@@ -19,6 +22,31 @@ const Cart = () => {
     useEffect(() => {
         fetchCart()
     }, []);
+
+    const handleCreateOrder = async () => {
+        setLoading(true);
+        try {
+            const data = await createOrder();
+            console.log("Orden creada:", data);
+            Swal.fire({
+                title: "Orden Creada",
+                text: "Tu orden ha sido creada con exito",
+                icon: "success",
+                timer: 1000
+            })
+        } catch (error) {
+            console.error(error)
+            Swal.fire({
+                title: 'Ocurrio un error',
+                text: "Tu orden no ha sido creada",
+                icon: "error",
+                timer: 1000
+            })
+        } finally {
+            setLoading(false);
+            fetchCart();
+        }
+    }
 
     const handleQuantityChange = async (itemId, newQty) => {
         if (newQty < 1) return;
@@ -165,8 +193,8 @@ const Cart = () => {
                     </div>
                     
                     <div className="px-6 w-xs">
-                        <Button className="uppercase">
-                            Continuar tu compra
+                        <Button onClick={handleCreateOrder} disabled={loading} className="uppercase">
+                            {loading ? "Creando orden..." : "Continuar tu compra"}
                         </Button>
                     </div>
                 </div>
