@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { User, ShoppingCart, Menu, Search, House, LogOut, X } from 'lucide-react';
+import { User, ShoppingCart, Menu, Search, House, LogOut, X, ClipboardList } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../hooks/UseAuth';
@@ -61,6 +61,10 @@ const Navbar = () => {
         {
           isSeller ? null : <ShoppingCart className="cursor-pointer hover:scale-110" onClick={() => navigate('/cart')} />
         }
+        <ClipboardList
+          className='cursor-pointer hover:scale-110'
+          onClick={() => navigate('/orders')}
+        />
         <LogOut
           className='cursor-pointer hover:scale-110'
           onClick={() => logout()}
