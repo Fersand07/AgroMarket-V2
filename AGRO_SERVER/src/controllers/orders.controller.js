@@ -188,4 +188,48 @@ export const deleteOrder = async (req, res) => {
         console.log(error);
         res.status(500).json({ error: "Server error" });
     }
-}   
+}  
+
+export const updateOrderStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { newStatus } = req.body;
+
+
+        const validStatuses = ["pending", "in_progress", "completed", "cancelled"];
+        if (!newStatus || !validStatuses.includes(newStatus)) {
+            return res.status(400).json({ message: "Invalid or missing newStatus" });
+        }
+
+        const validTransitions = {
+            pending: ["in_progress", "cancelled"],
+            in_progress: ["completed"],
+            completed: [],
+            cancelled: []
+        };
+
+
+        const order = await Order.findById(id);
+        if(!order) {
+            return res.status(404).json({message: "Order not found"});
+        }
+
+        const currentStatus = order.status;
+
+        if (!validTransitions[currentStatus].includes(newStatus)) {
+            return res.status(400).json({
+                message: `Invalid status change from ${currentStatus} to ${newStatus}`
+            });
+        }
+
+
+        order.status = newStatus;
+        await order.save();
+
+        return res.status(200).json({ message: "Order status updated", order});
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error: "Server error"})
+    }
+}
