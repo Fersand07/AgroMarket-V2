@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../features/products/ProductGrid';
 import Pagination from '../components/Pagination';
 import TopControls from '../features/products/TopControls';
-import { getProducts } from '../services/productService';
+import { getProducts, getProductsByArea } from '../services/productService';
 import { Search } from 'lucide-react';
  
 const Home = () => {
@@ -19,7 +19,7 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getProducts();
+        const data = await getProductsByArea();
         const validProducts = data.products.filter(p =>
           p &&
           typeof p.name === 'string' &&

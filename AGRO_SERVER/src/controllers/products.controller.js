@@ -169,3 +169,39 @@ export const buyProductWithUserCredit = async (req, res) => {
         res.status(500).json({ error: "Error de server" });
     }
 }
+
+export const getNearbyProducts = async (req, res) => {
+    try {
+        const authToken = req.headers.authorization && req.headers.authorization.split(" ")[1];
+        const { id: userId } = jwt.verify(authToken, process.env.SECRET_KEY)
+
+        const user = await User.findById(userId);
+
+        if (!user || !user.location) {
+            return res.status(400).json({ message: "User location not found" });
+        }
+        const maxDistanceInMeters = req.query.maxDistance || 5000;
+
+        const nearbyUsers = await User.find({
+            location: {
+                $near: {
+                    $geometry: user.location,
+                    $maxDistance: maxDistanceInMeters
+                }
+            }
+        });
+
+        const nearbyUserIds = nearbyUsers.map(u => u._id);
+
+        // Buscar productos de esos usuarios
+        const products = await Product.find({ user: { $in: nearbyUserIds } })
+            .populate('category')
+            .populate('measureUnit');
+
+        return res.status(200).json({ products });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+}

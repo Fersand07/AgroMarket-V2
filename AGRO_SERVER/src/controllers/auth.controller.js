@@ -54,7 +54,7 @@ export const register = async (req, res) => {
       }
     }
 
-
+    Usr.location = { type: "Point", coordinates: [Usr.lng, Usr.lat] };
     await Usr.save();
     //const token = await Usr.getSignedJwtToken();
     res.status(201).json({
