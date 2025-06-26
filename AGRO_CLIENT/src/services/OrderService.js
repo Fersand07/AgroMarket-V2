@@ -73,7 +73,7 @@ export const updateOrderStatus = async (orderId, newStatus) => {
 
     if(!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Error al actulizar el estado de la orden");
+        throw new Error(error.message || "Error al actualizar el estado de la orden");
     }
 
     const data = await response.json();

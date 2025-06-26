@@ -102,7 +102,6 @@ const OrderDetail = () => {
     try {
       await updateOrderStatus(id, status);
       if (status === 'completed') {
-        
         navigate('/orders'); 
         return;
       }
