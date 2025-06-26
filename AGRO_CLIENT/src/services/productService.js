@@ -74,5 +74,24 @@ export const updateProduct = async (productId, updatedData) => {
   return await response.json();
 }
 
+export const getProductsByArea = async () => {
+  const token = localStorage.getItem('token')
+
+  const response = await fetch(`${API_URL}/products/nearby`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error al obtener productos cercanos');
+  }
+
+  const data = await response.json();
+  return data
+}
+
 
 

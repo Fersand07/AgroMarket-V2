@@ -33,6 +33,7 @@ export const updateUser = async (req, res) => {
         if (req.body.password) {
             user.password = req.body.password;
         }
+        user.location = { type: "Point", coordinates: [user.lng, user.lat] };
         await user.save();
         return res.status(200).json({ message: "Usuario actualizado" });
     } catch (error) {

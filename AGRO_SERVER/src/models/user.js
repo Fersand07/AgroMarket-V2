@@ -50,6 +50,10 @@ const userSchema = new Schema({
     image: {
         type: String,
         default: "https://res.cloudinary.com/agromarket/image/upload/v1669659305/Avatars/profile-sample.png"
+    },
+    location: {
+        type: { type: String, default: "Point" },
+        coordinates: { type: [Number], default: [0, 0] }
     }
 });
 
@@ -74,6 +78,8 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password
     );
 }
+
+userSchema.index({ location: "2dsphere" });
 
 
 export const User = model("User", userSchema);
