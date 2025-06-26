@@ -196,6 +196,11 @@ export const updateOrderStatus = async (req, res) => {
         const { newStatus } = req.body;
 
 
+        const validStatuses = ["pending", "in_progress", "completed", "cancelled"];
+        if (!newStatus || !validStatuses.includes(newStatus)) {
+            return res.status(400).json({ message: "Invalid or missing newStatus" });
+        }
+
         const validTransitions = {
             pending: ["in_progress", "cancelled"],
             in_progress: ["completed"],
