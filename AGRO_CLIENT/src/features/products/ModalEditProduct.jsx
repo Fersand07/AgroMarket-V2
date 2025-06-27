@@ -11,6 +11,7 @@ const ModalEditProduct = ({ product, isOpen, onClose }) => {
     name: "",
     description: "",
     price: "",
+    stock: "",
     category: "",
     measureUnit: "",
     image: ""
@@ -27,6 +28,7 @@ const ModalEditProduct = ({ product, isOpen, onClose }) => {
         name: product.name || "",
         description: product.description || "",
         price: product.price || "",
+        stock: product.stock || 0,
         category: product.category.name || "",
         measureUnit: product.measureUnit.name || "",
         image: product.image || ""
@@ -74,14 +76,24 @@ const ModalEditProduct = ({ product, isOpen, onClose }) => {
       category,
       measureUnit,
       price,
+      stock,
       image,
     } = form;
 
-    if (!form.name || !form.price || !form.category || !form.description || !form.measureUnit) {
+    if (!form.name || !form.price || !form.stock  || !form.category || !form.description || !form.measureUnit) {
       Swal.fire({
         icon: "warning",
         title: "Campos requeridos",
         text: "Por favor llena todos los campos obligatorios.",
+      });
+      return;
+    }
+
+    if(form.price < 0.01 || form.stock < 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campos requeridos",
+        text: "Por favor precio y stock deben ser mayores a 0",
       });
       return;
     }
@@ -122,6 +134,7 @@ const ModalEditProduct = ({ product, isOpen, onClose }) => {
       category: selectedCategory.name,
       measureUnit: selectedUnit.name,
       price: Number(price), 
+      stock: Number(stock),
       image: imageUrl
     }
 
@@ -205,6 +218,14 @@ const ModalEditProduct = ({ product, isOpen, onClose }) => {
             value={form.price}
             onChange={handleChange}
             placeholder="Precio"
+            className="px-3 py-2 border border-gray-300 rounded focus:outline-none"
+          />
+          <input
+            type="number"
+            name="stock"
+            placeholder="Stock"
+            value={form.stock}
+            onChange={handleChange}
             className="px-3 py-2 border border-gray-300 rounded focus:outline-none"
           />
            <select

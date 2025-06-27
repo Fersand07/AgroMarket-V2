@@ -12,7 +12,6 @@ const ProductCreateModal = ({ onClose }) => {
     description: '',
     category: '',
     measureUnit: 'Lb',
-    quantity: '',
     price: '',
     stock: '',
     image: null,
@@ -59,9 +58,9 @@ const ProductCreateModal = ({ onClose }) => {
 
     setIsSubmitting(true);
     
-    const { name, description, category, measureUnit, quantity, price, stock, image } = form;
+    const { name, description, category, measureUnit, price, stock, image } = form;
 
-    if (!name || !description || !category || !measureUnit || !quantity || !price || !stock) {
+    if (!name || !description || !category || !measureUnit || !price || !stock) {
       Swal.fire({
         icon: 'warning',
         title: 'Campos incompletos',
@@ -71,7 +70,7 @@ const ProductCreateModal = ({ onClose }) => {
       return;
     }   
 
-    if (Number(quantity) <= 0 || Number(price) <= 0 || Number(stock) <= 0) {
+    if (Number(price) < 0.01 || Number(stock) <= 0) {
       Swal.fire({
         icon: 'warning',
         title: 'Valores inválidos',
@@ -125,7 +124,6 @@ const ProductCreateModal = ({ onClose }) => {
       description,
       category: selectedCategory.name,
       measureUnit: selectedUnit.name,
-      quantity: Number(quantity),
       price: Number(price),
       stock: Number(stock),
       image: imageUrl,
@@ -225,14 +223,6 @@ const ProductCreateModal = ({ onClose }) => {
             ))}
           </select>
 
-          <input
-            type="number"
-            name="quantity"
-            placeholder="Cantidad"
-            value={form.quantity}
-            onChange={handleChange}
-            className="px-3 py-2 border border-gray-300 rounded focus:outline-none"
-          />
 
           <input
             type="number"
