@@ -11,7 +11,7 @@ export const userCreatedProduct = async (req, res) => {
     try {
         const authToken = req.headers.authorization && req.headers.authorization.split(" ")[1];
         const { id } = jwt.verify(authToken, process.env.SECRET_KEY)
-        const { name, description, price, quantity, stock,category, measureUnit, image } = req.body;
+        const { name, description, price, stock, category, measureUnit, image } = req.body;
         const categoryName = await Category.findOne({name:
             category});
         const measureUnitName = await MeasureUnit.findOne({name:
@@ -20,7 +20,6 @@ export const userCreatedProduct = async (req, res) => {
             name,
             description,
             price,
-            quantity,
             stock,
             category: categoryName._id,
             measureUnit: measureUnitName._id,
@@ -83,7 +82,7 @@ export const updateProductCreatedByUser = async (req, res) => {
     try {
         const authToken = req.headers.authorization && req.headers.authorization.split(" ")[1];
         const { id } = jwt.verify(authToken, process.env.SECRET_KEY)
-        const { name, description, price, category, measureUnit, image } = req.body;
+        const { name, description, price, stock, category, measureUnit, image } = req.body;
         const categoryName = await Category.findOne({name:
             category});
         const measureUnitName = await MeasureUnit.findOne({name:
@@ -93,6 +92,7 @@ export const updateProductCreatedByUser = async (req, res) => {
             product.name = name? name: product.name;
             product.description = description? description: product.description;
             product.price = price? price: product.price;
+            product.stock = stock? stock: product.stock;
             product.category = categoryName? categoryName._id: product.category;
             product.measureUnit = measureUnitName? measureUnitName._id: product.measureUnit;
             product.image = image? image: product.image;

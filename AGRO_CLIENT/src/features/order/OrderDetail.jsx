@@ -112,6 +112,21 @@ const OrderDetail = () => {
     }
   }
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'Pendiente';
+      case 'in_progress':
+        return 'En Progreso';
+      case 'completed':
+        return 'Entregado';
+      case 'cancelled':
+        return 'Cancelado';
+      default:
+        return status;
+    }
+  };
+
   const renderActionButton = () => {
     const currentStatus = orderData?.status;
 
@@ -218,7 +233,7 @@ const OrderDetail = () => {
             <Package className="h-8 w-8 text-purple-600 mr-3" />
             <div>
               <p className="text-sm text-purple-600 font-medium">Estado</p>
-              <p className="text-xl font-bold text-purple-800 capitalize">{order.status}</p>
+              <p className="text-xl font-bold text-purple-800 capitalize">{getStatusText(order.status)}</p>
             </div>
           </div>
         </div>
