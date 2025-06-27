@@ -180,7 +180,7 @@ export const getNearbyProducts = async (req, res) => {
         if (!user || !user.location) {
             return res.status(400).json({ message: "User location not found" });
         }
-        const maxDistanceInMeters = req.query.maxDistance || 5000;
+        const maxDistanceInMeters = req.query.maxDistance || 15000;
 
         const nearbyUsers = await User.find({
             location: {
