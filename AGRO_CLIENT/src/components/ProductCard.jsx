@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import Button from "./Button";
 
-const ProductCard = ({ product,  onViewDetails}) => {
+const ProductCard = ({ product, onViewDetails }) => {
 
     const role = useMemo(() => localStorage.getItem('role'), [])
     
@@ -10,7 +10,8 @@ const ProductCard = ({ product,  onViewDetails}) => {
         return text.length > maxLength ? text.slice(0, maxLength - 2) + '...' : text;
     }
 
-    const isSeller = role ==="seller";
+    const isSeller = role === "seller";
+    const isOutOfStock = product.stock === 0;
 
     return (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden max-w-sm">
@@ -20,7 +21,6 @@ const ProductCard = ({ product,  onViewDetails}) => {
                 e.target.onerror = null;
                 e.target.src = "https://static.vecteezy.com/system/resources/previews/009/007/134/non_2x/failed-to-load-page-concept-illustration-flat-design-eps10-modern-graphic-element-for-landing-page-empty-state-ui-infographic-icon-vector.jpg"
             }}
-
             />
         )}
         <div className="font-poppins p-2">
@@ -29,15 +29,36 @@ const ProductCard = ({ product,  onViewDetails}) => {
             <p className="text-black text-base">${product.price}</p>
             {
                 isSeller ? (
-                    <p className="text-black text-base">stock: {product.stock} {product.measureUnit.name}</p>
+                    <div>
+                        <p className={`text-base ${isOutOfStock ? 'text-red-500' : 'text-black'}`}>
+                            stock: {product.stock} {product.measureUnit.name}
+                        </p>
+                        {isOutOfStock && (
+                            <p className="text-red-500 text-sm font-medium">Producto sin stock</p>
+                        )}
+                    </div>
                 ) : (
-                    null
+                    // Mostrar estado de stock para compradores
+                    isOutOfStock && <p className="text-red-500 text-sm font-medium">Sin stock disponible</p>
                 )
             }
         </div> 
-        <div className="max-w-sm mb-2  flex justify-center">
-            <Button className="bg-primaryColor hover:bg-primaryAltDark" onClick={() => onViewDetails(product)}>
-                {isSeller ? 'Editar' : 'Agregar al carrito'}
+        <div className="max-w-sm mb-2 flex justify-center">
+            <Button 
+                className={`${
+                    isOutOfStock && !isSeller 
+                        ? 'bg-gray-400 cursor-not-allowed hover:bg-gray-400' 
+                        : 'bg-primaryColor hover:bg-primaryAltDark'
+                }`}
+                onClick={() => onViewDetails(product)}
+                disabled={isOutOfStock && !isSeller}
+            >
+                {isSeller 
+                    ? 'Editar' 
+                    : isOutOfStock 
+                        ? 'Sin stock' 
+                        : 'Agregar al carrito'
+                }
             </Button>
         </div>
     </div>
