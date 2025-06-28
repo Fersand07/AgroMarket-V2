@@ -74,10 +74,10 @@ export const updateProduct = async (productId, updatedData) => {
   return await response.json();
 }
 
-export const getProductsByArea = async () => {
+export const getProductsByArea = async (distanceRadius) => {
   const token = localStorage.getItem('token')
 
-  const response = await fetch(`${API_URL}/products/nearby`, {
+  const response = await fetch(`${API_URL}/products/nearby?maxDistance=${distanceRadius}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`

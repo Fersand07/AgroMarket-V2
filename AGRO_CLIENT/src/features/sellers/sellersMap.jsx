@@ -1,24 +1,41 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Users, TrendingUp, Package } from 'lucide-react';
-import { getSellers } from '../../services/UserService';
+import { getSellers, getUserInfo } from '../../services/UserService';
 
 const SellersMap = () => {
   const mapRef = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [sellers, setSellers] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchSellers = async () => {
     try {
         const data = await getSellers();
-        console.log(data);
+        console.log('Sellers data:', data);
         setSellers(data)
     } catch (error) {
-        console.error(error)
+        console.error('Error fetching sellers:', error)
+    }
+  }
+
+  const fetchUser = async () => {
+    try {
+        const data = await getUserInfo();
+        setUser(data.user);
+    } catch (error) {
+        console.error('Error fetching user:', error)
     }
   }
 
   useEffect(() => {
-    fetchSellers()
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchSellers(), fetchUser()]);
+      setLoading(false);
+    };
+    
+    loadData();
 
     // Cargar Leaflet si no está disponible
     if (!window.L) {
@@ -37,7 +54,8 @@ const SellersMap = () => {
   }, []);
 
   useEffect(() => {
-    if (mapLoaded && sellers.length > 0 && mapRef.current) {
+    
+    if (mapLoaded && !loading && mapRef.current) {
       // Limpiar mapa existente
       if (mapRef.current._leaflet_id) {
         mapRef.current._leaflet_map?.remove();
@@ -52,7 +70,7 @@ const SellersMap = () => {
         maxZoom: 19
       }).addTo(map);
 
-      // Crear icono personalizado
+      // Crear icono personalizado para sellers
       const sellerIcon = window.L.divIcon({
         className: 'custom-seller-icon',
         html: `<div style="
@@ -95,24 +113,73 @@ const SellersMap = () => {
         iconAnchor: [20, 20]
       });
 
+      // Ícono para el usuario
+      const userIcon = window.L.divIcon({
+        className: 'custom-user-icon',
+        html: `<div style="
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4), 0 2px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        ">🧍‍♂️</div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+
       const markers = [];
 
-      // Agregar marcadores
-      sellers.forEach(seller => {
-        const [lng, lat] = seller.location.coordinates;
+      // Agregar marcadores de sellers
+      if (sellers && sellers.length > 0) {
+        sellers.forEach(seller => {
+          if (seller.location && seller.location.coordinates) {
+            const [lng, lat] = seller.location.coordinates;
+            console.log(`Adding seller marker: ${seller.username} at [${lat}, ${lng}]`);
+            
+            const marker = window.L.marker([lat, lng], { icon: sellerIcon })
+              .addTo(map)
+              .bindPopup(`
+                <div style="text-align: center; padding: 8px; font-family: 'Poppins', sans-serif;">
+                  <h3 style="margin: 0 0 8px 0; font-size: 1.125rem; font-weight: 600; color: #111827;">
+                    🛍️ ${seller.username}
+                  </h3>
+                </div>
+              `);
+            
+            markers.push(marker);
+          }
+        });
+      }
+
+      // Agregar marcador del usuario
+      if (user && user.location && user.location.coordinates && Array.isArray(user.location.coordinates)) {
+        const [lng, lat] = user.location.coordinates;
+        console.log(`Adding user marker: ${user.username} at [${lat}, ${lng}]`);
         
-        const marker = window.L.marker([lat, lng], { icon: sellerIcon })
-          .addTo(map)
-          .bindPopup(`
+        const userMarker = window.L.marker([lat, lng], { icon: userIcon })
+            .addTo(map)
+            .bindPopup(`
             <div style="text-align: center; padding: 8px; font-family: 'Poppins', sans-serif;">
-              <h3 style="margin: 0 0 8px 0; font-size: 1.125rem; font-weight: 600; color: #111827;">
-                🛍️ ${seller.username}
-              </h3>
+                <h3 style="margin: 0 0 8px 0; font-size: 1.125rem; font-weight: 600; color: #111827;">
+                🙋 ${user.username} (Tú)
+                </h3>
             </div>
-          `);
-        
-        markers.push(marker);
-      });
+            `);
+
+        markers.push(userMarker);
+      } else {
+        console.log('User marker not added - missing location data');
+        console.log('User object:', user);
+      }
 
       // Ajustar vista para mostrar todos los marcadores
       if (markers.length > 0) {
@@ -177,7 +244,7 @@ const SellersMap = () => {
         }
       };
     }
-  }, [mapLoaded, sellers]);
+  }, [mapLoaded, sellers, user, loading]);
 
   return (
     <div className="max-w-6xl mx-auto p-6 font-poppins bg-white">
@@ -185,8 +252,6 @@ const SellersMap = () => {
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Mapa de Vendedores</h1>
         <p className="text-gray-600">Visualización de vendedores registrados en el sistema</p>
       </div>
-
-      {/* Map Container */}
       <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
         <div className="bg-gray-50 px-6 py-3 border-b">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -199,11 +264,13 @@ const SellersMap = () => {
           className="h-96 w-full" 
           style={{ minHeight: '400px' }}
         >
-          {!mapLoaded && (
+          {(!mapLoaded || loading) && (
             <div className="flex items-center justify-center h-full bg-gray-100">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600">Cargando mapa...</p>
+                <p className="mt-4 text-gray-600">
+                  {!mapLoaded ? 'Cargando mapa...' : 'Cargando datos...'}
+                </p>
               </div>
             </div>
           )}
