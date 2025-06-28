@@ -40,4 +40,22 @@ export async function updateUser(updatedData) {
   return data;
 }
 
+export async function getSellers() {
+  const token = localStorage.getItem('token');
+
+  const response = await fetch(`${API_URL}/profile/nearby-sellers`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if(!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Error fetching sellers")
+  }
+
+  const data = await response.json();
+  return data.sellers;
+}
+
 

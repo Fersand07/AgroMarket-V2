@@ -78,3 +78,35 @@ export const changeImage = async (req,res) => {
         res.status(500).json({ error: "Error de server" });
     }                
 } 
+
+export const getNearbySellers = async (req, res) => {
+    try {
+        const authToken = req.headers.authorization && req.headers.authorization.split(" ")[1];
+        const { id: userId } = jwt.verify(authToken, process.env.SECRET_KEY);
+
+        const user = await User.findById(userId);
+
+        if (!user || !user.location) {
+            return res.status(400).json({ message: "User location not found" });
+        }
+
+        const maxDistanceInMeters = req.query.maxDistance || 15000;
+
+        const nearbySellers = await User.find({
+            _id: { $ne: userId }, // Excluir al propio usuario
+            role: "seller",
+            location: {
+                $near: {
+                    $geometry: user.location,
+                    $maxDistance: maxDistanceInMeters
+                }
+            }
+        }).select("username location"); // Solo lo necesario para el mapa
+
+        return res.status(200).json({ sellers: nearbySellers });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+};

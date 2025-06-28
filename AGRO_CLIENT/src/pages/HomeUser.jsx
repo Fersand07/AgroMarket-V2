@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '../features/products/ProductGrid';
 import Pagination from '../components/Pagination';
 import TopControls from '../features/products/TopControls';
-import { getProducts, getProductsByArea } from '../services/productService';
+import { getProductsByArea } from '../services/productService';
 import { Search } from 'lucide-react';
  
 const Home = () => {
@@ -12,6 +12,7 @@ const Home = () => {
   const [perPage, setPerPage] = useState(12);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [sortValue, setSortValue] = useState('name-asc');
+  const [distanceRadius, setDistanceRadius] = useState(1000);
   const [searchParams] = useSearchParams();
  
   const searchTerm = searchParams.get('search') || '';
@@ -19,7 +20,7 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getProductsByArea();
+        const data = await getProductsByArea(distanceRadius);
         const validProducts = data.products.filter(p =>
           p &&
           typeof p.name === 'string' &&
@@ -35,7 +36,7 @@ const Home = () => {
     };
  
     fetchData();
-  }, []);
+  }, [distanceRadius]);
  
   useEffect(() => {
     setCurrentPage(1);
@@ -86,6 +87,8 @@ const Home = () => {
         sortValue={sortValue}
         setSortValue={setSortValue}
         categories={categories}
+        distanceRadius={distanceRadius}
+        setDistanceRadius={setDistanceRadius}
       />
  
       {sorted.length === 0 ? (
