@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { User, ShoppingCart, Search, House, LogOut, X, ClipboardList } from 'lucide-react';
+import { User, ShoppingCart, Search, House, LogOut, X, ClipboardList, Map } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../hooks/UseAuth';
@@ -62,7 +62,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-green-800 text-white p-4 flex items-center justify-between">
-      <div className="flex items-center gap-1 w-80">
+      <div className="flex items-center gap-1 w-90">
         <AnimatedNavIcon
           icon={House}
           text="INICIO"
@@ -87,6 +87,12 @@ const Navbar = () => {
           icon={ClipboardList}
           text="PEDIDOS"
           onClick={() => navigate('/orders')}
+        />
+
+        <AnimatedNavIcon
+          icon={Map}
+          text="MAPA"
+          onClick={() => navigate('/map')}
         />
         
         <AnimatedNavIcon

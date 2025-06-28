@@ -9,6 +9,7 @@ import Cart from '../features/cart/Cart';
 import SellerHome from '../pages/SellerHome';
 import OrdersPreview from '../features/order/order';
 import OrderDetail from '../features/order/OrderDetail';
+import SellersMap from '../features/sellers/sellersMap';
 
 
 
@@ -27,6 +28,9 @@ const AppRouter = () => {
           </PrivateRoute>} />
           <Route path='/cart' element={ <PrivateRoute roleRequired={'user'}>
             <Cart />
+          </PrivateRoute>} />
+          <Route path='/map' element={ <PrivateRoute roleRequired={'user'}>
+            <SellersMap />
           </PrivateRoute>} />
       
           <Route path="/seller/home" element={ <PrivateRoute roleRequired={'seller'}>
