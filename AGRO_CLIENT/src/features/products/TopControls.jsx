@@ -38,7 +38,8 @@ const TopControls = ({
           </select>
         </div>
 
-        <div>
+        { role === 'user' ? (
+          <div>
           <label className="text-sm mr-2">Distancia:</label>
           <select
             value={distanceRadius}
@@ -52,6 +53,7 @@ const TopControls = ({
             ))}
           </select>
         </div>
+        ) : null}
 
         <div>
           <label className="text-sm mr-2">Ordenar por:</label>

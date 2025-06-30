@@ -314,11 +314,11 @@ const OrderDetail = () => {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Comprador:</span>
-              <span className="font-medium">#{order.buyer._id.slice(-8)}</span>
+              <span className="font-medium">{order.buyer.username}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Vendedor:</span>
-              <span className="font-medium">#{order.seller._id.slice(-8)}</span>
+              <span className="font-medium">{order.seller.username}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Cantidad de productos:</span>

@@ -89,11 +89,13 @@ const Navbar = () => {
           onClick={() => navigate('/orders')}
         />
 
-        <AnimatedNavIcon
+        {!isSeller && (
+          <AnimatedNavIcon
           icon={Map}
           text="MAPA"
           onClick={() => navigate('/map')}
         />
+        )}
         
         <AnimatedNavIcon
           icon={LogOut}
