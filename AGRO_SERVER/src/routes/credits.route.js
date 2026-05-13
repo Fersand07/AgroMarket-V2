@@ -1,5 +1,4 @@
 import express from "express";
-import { body } from 'express-validator';
 import { getCredits, addCreditsToUser, substractCreditsFromUser } from "../controllers/credits.controller.js";
 import { requireToken } from '../middlewares/requireToken.js';
 
