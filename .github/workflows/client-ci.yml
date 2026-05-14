@@ -37,6 +37,7 @@ jobs:
     name: Build check
     runs-on: ubuntu-latest
     needs: lint
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: AGRO_CLIENT
@@ -56,7 +57,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        run: npm run build -- --mode production
 
   security:
     name: Security audit
