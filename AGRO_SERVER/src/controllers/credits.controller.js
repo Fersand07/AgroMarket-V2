@@ -21,7 +21,7 @@ export const addCreditsToUser = async (req, res) => {
         user.credit += credits;
         await user.save();
         res.status(200).json({ credits: user.credit });
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error de server" });
     }
 };
@@ -35,7 +35,7 @@ export const substractCreditsFromUser = async (req, res) => {
         user.credit -= credits;
         await user.save();
         res.status(200).json({ credits: user.credit });
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error de server" });
     }
 };
