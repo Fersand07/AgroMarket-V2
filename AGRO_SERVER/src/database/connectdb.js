@@ -1,16 +1,16 @@
-import mongoose from "mongoose";
+import { PrismaClient } from '@prisma/client';
 
-mongoose.set('strictQuery', false);
+export const prisma = new PrismaClient();
 
-const uri = process.env.MONGODB_URI;
-
-async function connectDB() {
+async function checkDatabaseConnection() {
     try {
-        await mongoose.connect(uri, { useNewUrlParser: true });
-        console.log('base de datos conectada');
-    } catch (e) {
-        console.log('error al conectar la base de datos: ' + e);
+        // Intenta conectar a la base de datos
+        await prisma.$connect();
+        console.log('✅ Base de datos conectada exitosamente (PostgreSQL en Neon).');
+    } catch (error) {
+        console.error('❌ Error al conectar a la base de datos PostgreSQL:');
+        console.error(error.message);
     }
 }
 
-connectDB();
+checkDatabaseConnection();
