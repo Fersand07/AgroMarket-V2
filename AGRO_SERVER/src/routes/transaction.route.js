@@ -1,4 +1,5 @@
 import express from "express";
+import { body } from 'express-validator';
 import { createTransaction, getTransactionByUser } from "../controllers/transactions.controller.js";
 import { requireToken } from "../middlewares/requireToken.js";
 
