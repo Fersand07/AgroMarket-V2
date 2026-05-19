@@ -1,18 +1,38 @@
 import RegisterForm from "../features/auth/RegisterForm"
-import bgImage from "../assets/bg-forms1.svg"
-import Logo from "../assets/AGROMARKET.svg"
+import Logo from "../components/Logo"
 
 const Register = () => {
     return (
-        <div className="flex flex-row h-screen" style={{backgroundImage: `url(${bgImage})`}}>
-            <div className="w-2xl bg-altBgColor/20 flex flex-col items-center justify-center">
-                <div className="w-48 h-48 bg-altBgColor rounded-full">
-                    <img  src={Logo} />
-                </div>
+        <div className="flex flex-col md:flex-row min-h-screen bg-[#09110a]">
+
+            {/* Ambient glow effects */}
+            <div className="pointer-events-none fixed inset-0 overflow-hidden">
+                <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-green-900/20 rounded-full blur-[120px]" />
+                <div className="absolute -bottom-40 -right-20 w-[400px] h-[400px] bg-green-950/25 rounded-full blur-[100px]" />
             </div>
-            <div className="bg-primaryColor w-screen flex flex-col items-center justify-center gap-8">
-                <h1 className="text-white font-bold font-poppins text-3xl">Registrate</h1>
-                <RegisterForm/>
+
+            {/* Left side: Logo */}
+            <div className="hidden md:flex w-[35%] flex-col items-center justify-center border-r border-white/5 select-none relative z-10 gap-6 px-10 min-h-screen">
+                <Logo variant="large" />
+                <p className="text-white/40 text-sm font-poppins text-center leading-relaxed px-4">
+                    La plataforma de comercio agrícola local de El Salvador
+                </p>
+            </div>
+
+            {/* Right side: Form */}
+            <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto py-10 px-4 relative z-10">
+                {/* Mobile logo */}
+                <div className="md:hidden mb-8">
+                    <Logo variant="navbar" />
+                </div>
+
+                <div className="w-full max-w-2xl">
+                    <div className="mb-8 text-center md:text-left">
+                        <h1 className="text-white font-black font-poppins text-3xl tracking-tight">Crear Cuenta</h1>
+                        <p className="text-white/50 font-poppins text-sm mt-1">Únete a AgroMarket y empieza a comprar o vender productos locales</p>
+                    </div>
+                    <RegisterForm />
+                </div>
             </div>
         </div>
     )
