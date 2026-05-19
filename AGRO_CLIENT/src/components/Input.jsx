@@ -3,12 +3,13 @@ const Input = ({
     type = 'text',
     value,
     onChange,
-    placeHolder = '' ,
+    placeHolder = '',
     required = false,
-    error = ''
+    error = '',
+    className = ''
 }) => {
-    return(
-        <div>
+    return (
+        <div className="w-full">
             <input 
                 type={type}
                 name={name}
@@ -17,11 +18,10 @@ const Input = ({
                 onChange={onChange}
                 required={required}
                 placeholder={placeHolder}
-                className={`bg-altBgColor rounded-sm p-2.5 w-xs text-black shadow-2xl font-poppins ${error ? 'border-red-500' : 'border-gray-300'}`}
+                className={`w-full bg-white/5 text-white placeholder-white/30 border rounded-xl px-4 py-3 font-poppins text-sm outline-none transition-all duration-200 focus:ring-0 focus:border-successLight/60 focus:bg-white/8 shadow-inner ${error ? 'border-red-500/50 bg-red-950/20' : 'border-white/10'} ${className}`}
             />
-            {error && <p className="text-sm font-bold text-errorColor mt-1 font-poppins break-words w-xs ">{error}</p>}
+            {error && <p className="text-xs font-semibold text-red-400 mt-1.5 font-poppins pl-1">{error}</p>}
         </div>
-        
     )
 }
 
