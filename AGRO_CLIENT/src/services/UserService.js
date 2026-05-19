@@ -58,4 +58,81 @@ export async function getSellers() {
   return data.sellers;
 }
 
+export async function addCredits(amount) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/credits/add`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ credits: parseFloat(amount) })
+  });
 
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error al recargar créditos");
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+export async function substractCredits(amount) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/credits/substract`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ credits: parseFloat(amount) })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error al retirar saldo");
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+export async function createTransaction(type, value) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/transactions/add`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ type, value: parseFloat(value) })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error al crear transacción");
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+export async function getTransactions() {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/transactions/get`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error al obtener transacciones");
+  }
+
+  const data = await response.json();
+  return data;
+}
