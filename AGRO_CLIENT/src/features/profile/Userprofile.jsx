@@ -678,7 +678,6 @@ const UserProfile = () => {
         )}
 
         {/* Seller Dashboard Panel */}
-        {/* Calculates sales metrics, transaction history and item popularity in real-time */}
         {isSeller && (
           <div className="mt-12 pt-8 border-t border-white/10 animate-fade-in space-y-8">
             {/* Title */}
