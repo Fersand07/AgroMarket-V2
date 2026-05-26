@@ -6,7 +6,8 @@ import TopControls from '../features/products/TopControls';
 import { getProductsPostedByUser } from '../services/productService';
 import ProductCreateModal from '../features/products/ProductModal';
 import { Search } from 'lucide-react';
- 
+import AgroWeather from '../components/AgroWeather';
+
 const SellerHome = () => {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -79,15 +80,17 @@ const SellerHome = () => {
   const currentProducts = sorted.slice(start, start + perPage);
  
   return (
-    <div className="px-4 sm:px-10 md:px-32 py-4">
+    <div className="py-2 space-y-6">
+      <AgroWeather />
       {searchTerm && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800">
-            <span className="font-semibold">Buscando en mis productos:</span> "{searchTerm}"
-            <span className="ml-4 text-sm text-green-600">
-              ({sorted.length} producto{sorted.length !== 1 ? 's' : ''} encontrado{sorted.length !== 1 ? 's' : ''})
-            </span>
+        <div className="mb-6 p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl text-white shadow-xl flex items-center justify-between font-poppins animate-fade-in">
+          <p className="text-sm">
+            <span className="font-bold text-white/70 uppercase tracking-wider mr-2">Mis Productos:</span> 
+            <span className="text-successLight font-extrabold text-base">"{searchTerm}"</span>
           </p>
+          <span className="text-xs px-3 py-1 rounded-full bg-successLight/10 border border-successLight/20 text-successLight font-black uppercase tracking-widest">
+            {sorted.length} {sorted.length === 1 ? 'Producto' : 'Productos'}
+          </span>
         </div>
       )}
        
@@ -101,25 +104,27 @@ const SellerHome = () => {
       />
  
       {sorted.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-4">
-            <Search size={64} className="mx-auto" />
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-12 text-center shadow-2xl max-w-2xl mx-auto font-poppins mt-8">
+          <div className="text-successLight/60 mb-6 flex justify-center">
+            <div className="p-4 bg-white/5 rounded-full border border-white/10 shadow-lg">
+              <Search size={54} className="animate-pulse" />
+            </div>
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
-            {searchTerm ? 'No se encontraron productos' : 'No tienes productos publicados'}
+          <h3 className="text-2xl font-black text-white mb-3 tracking-wide">
+            {searchTerm ? 'Sin coincidencias' : 'Aún no tienes productos'}
           </h3>
-          <p className="text-gray-500 mb-6">
+          <p className="text-white/60 text-sm max-w-md mx-auto leading-relaxed mb-8">
             {searchTerm
-              ? `No tienes productos que coincidan con "${searchTerm}"`
-              : 'Comienza creando tu primer producto para vender'
+              ? `No encontramos ningún producto en tu inventario que coincida con "${searchTerm}". Intenta con otra palabra.`
+              : 'Comienza a expandir tu negocio subiendo tu primer producto fresco para los compradores locales de la zona.'
             }
           </p>
           {!searchTerm && (
             <button
               onClick={() => setShowModal(true)}
-              className="bg-green-800 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold"
+              className="bg-successLight text-primaryAltDark hover:bg-white hover:text-green-950 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl transition-all duration-300 border border-successLight/10 hover:border-white shadow-[0_4px_14px_rgba(164,214,160,0.3)] hover:shadow-[0_4px_20px_rgba(255,255,255,0.2)] cursor-pointer"
             >
-              Crear mi primer producto
+              Publicar mi Primer Producto
             </button>
           )}
         </div>
@@ -148,4 +153,3 @@ const SellerHome = () => {
 };
  
 export default SellerHome;
- 
