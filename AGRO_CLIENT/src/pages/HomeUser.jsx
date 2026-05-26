@@ -5,6 +5,7 @@ import Pagination from '../components/Pagination';
 import TopControls from '../features/products/TopControls';
 import { getProductsByArea } from '../services/productService';
 import { Search } from 'lucide-react';
+import AgroWeather from '../components/AgroWeather';
  
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -69,15 +70,17 @@ const Home = () => {
   const currentProducts = sorted.slice(start, start + perPage);
  
   return (
-    <div className="px-4 sm:px-10 md:px-32 py-4">
+    <div className="py-2 space-y-6">
+      <AgroWeather />
       {searchTerm && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800">
-            <span className="font-semibold">Resultados para:</span> "{searchTerm}"
-            <span className="ml-4 text-sm text-green-600">
-              ({sorted.length} producto{sorted.length !== 1 ? 's' : ''} encontrado{sorted.length !== 1 ? 's' : ''})
-            </span>
+        <div className="mb-6 p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl text-white shadow-xl flex items-center justify-between font-poppins animate-fade-in">
+          <p className="text-sm">
+            <span className="font-bold text-white/70 uppercase tracking-wider mr-2">Búsqueda:</span> 
+            <span className="text-successLight font-extrabold text-base">"{searchTerm}"</span>
           </p>
+          <span className="text-xs px-3 py-1 rounded-full bg-successLight/10 border border-successLight/20 text-successLight font-black uppercase tracking-widest">
+            {sorted.length} {sorted.length === 1 ? 'Producto' : 'Productos'}
+          </span>
         </div>
       )}
  
@@ -92,17 +95,19 @@ const Home = () => {
       />
  
       {sorted.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-4">
-            <Search size={64} className="mx-auto" />
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-12 text-center shadow-2xl max-w-2xl mx-auto font-poppins mt-8">
+          <div className="text-successLight/60 mb-6 flex justify-center">
+            <div className="p-4 bg-white/5 rounded-full border border-white/10 shadow-lg">
+              <Search size={54} className="animate-pulse" />
+            </div>
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <h3 className="text-2xl font-black text-white mb-3 tracking-wide">
             No se encontraron productos
           </h3>
-          <p className="text-gray-500">
+          <p className="text-white/60 text-sm max-w-md mx-auto leading-relaxed">
             {searchTerm
-              ? `No hay productos que coincidan con "${searchTerm}"`
-              : 'No hay productos disponibles en esta categoría'
+              ? `Lamentablemente no encontramos coincidencias para la búsqueda de "${searchTerm}". Intenta buscar otra palabra clave o cambiar los filtros.`
+              : 'No hay productos disponibles actualmente en esta categoría para tu zona.'
             }
           </p>
         </div>
