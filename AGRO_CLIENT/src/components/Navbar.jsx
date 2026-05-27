@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { User, ShoppingCart, Search, House, LogOut, X, ClipboardList, Map } from 'lucide-react';
-import logo from '../assets/logo.png';
+import Logo from './Logo';
 import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../hooks/UseAuth';
 
@@ -48,12 +48,12 @@ const Navbar = () => {
 
   const AnimatedNavIcon = ({ icon: Icon, text, onClick, className = "" }) => (
     <div 
-      className={`group cursor-pointer flex items-center overflow-hidden bg-green-700 rounded-full transition-all duration-600 ease-in-out hover:bg-primaryAltDark ${className}`}
+      className={`group cursor-pointer flex items-center overflow-hidden bg-white/10 hover:bg-successLight hover:text-primaryAltDark border border-white/5 rounded-full transition-all duration-300 ease-in-out ${className}`}
       onClick={onClick}
     >
-      <div className="flex items-center px-3 py-2 transition-all duration-300 ease-in-out group-hover:px-4">
-        <Icon className="transition-transform duration-600 group-hover:scale-110" />
-        <span className="ml-0 max-w-0 overflow-hidden whitespace-nowrap font-semibold transition-all duration-600 ease-in-out group-hover:ml-2 group-hover:max-w-xs">
+      <div className="flex items-center px-4.5 py-2.5 transition-all duration-300 ease-in-out">
+        <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+        <span className="ml-0 max-w-0 overflow-hidden whitespace-nowrap font-poppins font-bold text-xs uppercase tracking-wide transition-all duration-300 ease-in-out group-hover:ml-2 group-hover:max-w-xs">
           {text}
         </span>
       </div>
@@ -61,73 +61,82 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="bg-green-800 text-white p-4 flex items-center justify-between">
-      <div className="flex items-center gap-1 w-90">
+    <nav className="bg-green-950/95 backdrop-blur-md border-b border-white/10 text-white px-6 py-4 flex flex-col lg:flex-row items-center justify-between gap-5 shadow-2xl select-none">
+      
+      {/* Left side: Navigation Pills */}
+      <div className="flex flex-wrap items-center justify-center gap-2.5 order-2 lg:order-1">
         <AnimatedNavIcon
           icon={House}
-          text="INICIO"
+          text="Inicio"
           onClick={() => navigate(isSeller ? "/seller/home" : "/home")}
         />
         
         <AnimatedNavIcon
           icon={User}
-          text="PERFIL"
+          text="Perfil"
           onClick={() => navigate('/profile')}
         />
         
         {!isSeller && (
           <AnimatedNavIcon
             icon={ShoppingCart}
-            text="CARRITO"
+            text="Carrito"
             onClick={() => navigate('/cart')}
           />
         )}
         
         <AnimatedNavIcon
           icon={ClipboardList}
-          text="PEDIDOS"
+          text="Pedidos"
           onClick={() => navigate('/orders')}
         />
 
         {!isSeller && (
           <AnimatedNavIcon
-          icon={Map}
-          text="MAPA"
-          onClick={() => navigate('/map')}
-        />
+            icon={Map}
+            text="Mapa"
+            onClick={() => navigate('/map')}
+          />
         )}
         
         <AnimatedNavIcon
           icon={LogOut}
-          text="SALIR"
+          text="Salir"
           onClick={() => logout()}
+          className="hover:bg-red-500/20 hover:text-red-200 border-red-500/10"
         />
       </div>
 
-      <div className="flex items-center bg-primaryAltDark px-4 py-2 rounded-full w-full max-w-md relative">
-        <Search className="text-white mr-2" />
+      {/* Middle: Premium Search Bar */}
+      <div className="flex items-center bg-white/5 border border-white/10 focus-within:border-successLight/40 focus-within:bg-white/10 px-5 py-2.5 rounded-full w-full max-w-md relative transition-all duration-300 order-3 lg:order-2">
+        <Search className="text-white/60 mr-2 w-5 h-5" />
         <input
           type="text"
-          placeholder="BUSCAR"
+          placeholder="¿Qué estás buscando hoy?..."
           value={searchTerm}
           onChange={handleSearch}
           onKeyPress={handleSearchSubmit}
-          className="bg-transparent outline-none font-poppins font-semibold text-white placeholder-white w-full"
+          className="bg-transparent outline-none font-poppins font-semibold text-sm text-white placeholder-white/50 w-full"
         />
         {searchTerm && (
           <button
             onClick={clearSearch}
-            className="text-white hover:text-gray-300 ml-2 transition-colors duration-200"
+            className="text-white/60 hover:text-white ml-2 transition-colors duration-200"
             title="Limpiar búsqueda"
           >
-            <X/>
+            <X className="w-5 h-5" />
           </button>
         )}
       </div>
 
-      <div>
-        <img src={logo} alt="AgroMarket" className="h-8 object-contain" />
+      {/* Right side: Premium Vector Text Logo */}
+      <div className="order-1 lg:order-3">
+        <Logo 
+          variant="navbar"
+          onClick={() => navigate(isSeller ? "/seller/home" : "/home")} 
+        />
       </div>
+
     </nav>
   );
 };

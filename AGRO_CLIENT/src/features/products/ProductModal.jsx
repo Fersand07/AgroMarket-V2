@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { getCategories, getMeasureUnits } from '../../services/categoryService';
 import { createProductService } from '../../services/productService';
 import { uploadImage } from '../../helpers/cloudinary';
-import Swal from "sweetalert2";
+import { customSwal } from "../../helpers/swalHelper";
 import Button from '../../components/Button';
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, Package, FileText, ChevronDown } from 'lucide-react';
 
 const ProductCreateModal = ({ onClose }) => {
   const [form, setForm] = useState({
@@ -20,7 +20,6 @@ const ProductCreateModal = ({ onClose }) => {
   const [categories, setCategories] = useState([]);
   const [measureUnits, setMeasureUnits] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
@@ -54,37 +53,39 @@ const ProductCreateModal = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
-    if (isSubmitting) return; // Evita múltiples clics
+    if (isSubmitting) return;
 
     setIsSubmitting(true);
-    
     const { name, description, category, measureUnit, price, stock, image } = form;
 
     if (!name || !description || !category || !measureUnit || !price || !stock) {
-      Swal.fire({
+      customSwal.fire({
         icon: 'warning',
+        iconColor: '#FBBF24',
         title: 'Campos incompletos',
-        text: 'Por favor, completa todos los campos obligatorios.',
+        text: 'Por favor, completa todos los campos obligatorios.'
       });
       setIsSubmitting(false);
       return;
     }   
 
     if (Number(price) < 0.01 || Number(stock) <= 0) {
-      Swal.fire({
+      customSwal.fire({
         icon: 'warning',
+        iconColor: '#FBBF24',
         title: 'Valores inválidos',
-        text: 'Cantidad, precio y stock deben ser mayores a 0.',
+        text: 'Cantidad, precio y stock deben ser mayores a 0.'
       });
       setIsSubmitting(false);
       return;
     }
 
     if (!image) {
-      Swal.fire({
+      customSwal.fire({
         icon: 'warning',
+        iconColor: '#FBBF24',
         title: 'Imagen requerida',
-        text: 'Por favor, selecciona una imagen del producto.',
+        text: 'Por favor, selecciona una imagen del producto.'
       });
       setIsSubmitting(false);
       return;
@@ -94,10 +95,11 @@ const ProductCreateModal = ({ onClose }) => {
     const selectedUnit = measureUnits.find((u) => u.name === measureUnit);
 
     if (!selectedCategory || !selectedUnit) {
-      Swal.fire({
+      customSwal.fire({
         icon: 'error',
+        iconColor: '#EF4444',
         title: 'Datos inválidos',
-        text: 'Categoría o unidad de medida no válidas.',
+        text: 'Categoría o unidad de medida no válidas.'
       });
       setIsSubmitting(false);
       return;
@@ -109,13 +111,14 @@ const ProductCreateModal = ({ onClose }) => {
     try {
       imageUrl = await uploadImage(image);
     } catch (err) {
-      Swal.fire({
+      customSwal.fire({
         icon: 'error',
+        iconColor: '#EF4444',
         title: 'Error al subir la imagen',
-        text: 'Verifica tu conexión o intenta nuevamente.',
+        text: 'Verifica tu conexión o intenta nuevamente.'
       });
       setIsSubmitting(false);
-      console.error(err)
+      console.error(err);
       return;
     }
 
@@ -131,17 +134,21 @@ const ProductCreateModal = ({ onClose }) => {
 
     try {
       await createProductService(productToSend, token);
-      Swal.fire({
+      customSwal.fire({
         title: 'Producto creado',
         text: 'Producto creado correctamente',
         icon: 'success',
+        iconColor: '#A4D6A0',
+        timer: 2000,
+        showConfirmButton: false
       });
       onClose();
     } catch (err) {
-      Swal.fire({
+      customSwal.fire({
         icon: 'error',
+        iconColor: '#EF4444',
         title: 'Error al crear producto',
-        text: err.message || 'Intenta nuevamente',
+        text: err.message || 'Intenta nuevamente'
       });
       console.error('Error al crear producto:', err.message);
     } finally {
@@ -150,113 +157,176 @@ const ProductCreateModal = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 backdrop-blur-sm font-poppins bg-black/20 flex items-center justify-center">
-      <div className="w-[400px] bg-white rounded-md overflow-hidden shadow-lg">
-        <div className="bg-primaryColor text-white text-center py-3 text-lg font-semibold">
-          Información del Producto
+    <div className="fixed inset-0 z-50 backdrop-blur-md bg-black/60 flex items-center justify-center p-4 animate-fade-in">
+      <div className="w-full max-w-lg bg-green-950/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden font-poppins text-white select-none">
+        
+        {/* Modal Header */}
+        <div className="bg-gradient-to-r from-successLight/15 via-primaryColor/25 to-primaryAltDark/30 text-white text-center py-4.5 text-lg font-black uppercase tracking-wider border-b border-white/10 flex items-center justify-center gap-2">
+          <Package className="w-5 h-5 text-successLight" />
+          Publicar Nuevo Producto
         </div>
 
-        <div className="p-6 flex flex-col gap-3">
-          <label
-            htmlFor="imageUpload"
-            className="cursor-pointer bg-gray-200 h-32 flex items-center justify-center rounded-md border border-dashed border-gray-400"
-          >
-            {previewUrl ? (
-              <img src={previewUrl} alt="preview" className="max-h-full object-contain" />
-            ) : (   
-              <div className="text-gray-600 text-sm flex flex-col items-center justify-center text-center">
-                <ImagePlus style={{ width: '2em', height: '2em' }} />
-                <span>Agregar imagen</span>
+        {/* Modal Body */}
+        <div className="p-6 md:p-8 flex flex-col gap-5.5">
+          
+          {/* Image Uploader */}
+          <div className="flex flex-col">
+            <label className="text-xxs font-black text-successLight uppercase tracking-widest mb-2">
+              Fotografía del Producto
+            </label>
+            <label
+              htmlFor="imageUpload"
+              className="cursor-pointer bg-white/5 hover:bg-white/10 h-36 flex items-center justify-center rounded-2xl border-2 border-dashed border-white/15 hover:border-successLight/40 transition-all duration-300 overflow-hidden shadow-inner group"
+            >
+              {previewUrl ? (
+                <img src={previewUrl} alt="preview" className="w-full h-full object-cover group-hover:scale-102 transition duration-300" />
+              ) : (   
+                <div className="text-white/50 text-sm flex flex-col items-center justify-center text-center gap-2">
+                  <ImagePlus className="w-8 h-8 text-successLight/60 group-hover:scale-110 transition duration-300" />
+                  <span className="font-bold uppercase tracking-wider text-xxs">Cargar Imagen</span>
+                </div>
+              )}
+            </label>
+            <input
+              id="imageUpload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
+
+          {/* Details Row: Name and Description */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label className="text-xxs font-black text-successLight uppercase tracking-widest mb-1.5">
+                Nombre del Producto
+              </label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Ej: Tomate fresco"
+                value={form.name}
+                onChange={handleChange}
+                className="bg-green-950/40 text-white placeholder-white/35 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-successLight/40 focus:bg-green-950/60 transition-all duration-300 font-semibold text-sm w-full shadow-inner"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-xxs font-black text-successLight uppercase tracking-widest mb-1.5">
+                Descripción Breve
+              </label>
+              <input
+                type="text"
+                name="description"
+                placeholder="Ej: Cosechado ayer"
+                value={form.description}
+                onChange={handleChange}
+                className="bg-green-950/40 text-white placeholder-white/35 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-successLight/40 focus:bg-green-950/60 transition-all duration-300 font-semibold text-sm w-full shadow-inner"
+              />
+            </div>
+          </div>
+
+          {/* Category & Unit Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label className="text-xxs font-black text-successLight uppercase tracking-widest mb-1.5">
+                Categoría
+              </label>
+              <div className="relative">
+                <select
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  className="bg-green-950/40 text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-successLight/40 focus:bg-green-950/60 transition-all duration-300 font-semibold text-sm cursor-pointer w-full appearance-none pr-10 shadow-inner"
+                >
+                  <option value="" className="bg-green-950 text-white/50 font-semibold">Seleccionar</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat.name} className="bg-green-950 text-white font-semibold py-2">
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/50">
+                  <ChevronDown className="w-4 h-4" />
+                </div>
               </div>
-            )}
-          </label>
-          <input
-            id="imageUpload"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImageChange}
-          />
+            </div>
 
-          <input
-            type="text"
-            name="name"
-            placeholder="Nombre"
-            value={form.name}
-            onChange={handleChange}
-            className="px-3 py-2 border border-gray-300 rounded focus:outline-none"
-          />
+            <div className="flex flex-col">
+              <label className="text-xxs font-black text-successLight uppercase tracking-widest mb-1.5">
+                Unidad de Medida
+              </label>
+              <div className="relative">
+                <select
+                  name="measureUnit"
+                  value={form.measureUnit}
+                  onChange={handleChange}
+                  className="bg-green-950/40 text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-successLight/40 focus:bg-green-950/60 transition-all duration-300 font-semibold text-sm cursor-pointer w-full appearance-none pr-10 shadow-inner"
+                >
+                  {measureUnits.map((unit) => (
+                    <option key={unit._id} value={unit.name} className="bg-green-950 text-white font-semibold py-2">
+                      {unit.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/50">
+                  <ChevronDown className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <input
-            type="text"
-            name="description"
-            placeholder="Descripción"
-            value={form.description}
-            onChange={handleChange}
-            className="px-3 py-2 border border-gray-300 rounded focus:outline-none"
-          />
+          {/* Pricing & Stock Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label className="text-xxs font-black text-successLight uppercase tracking-widest mb-1.5">
+                Inventario / Stock
+              </label>
+              <input
+                type="number"
+                name="stock"
+                placeholder="Ej: 50"
+                value={form.stock}
+                onChange={handleChange}
+                className="bg-green-950/40 text-white placeholder-white/35 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-successLight/40 focus:bg-green-950/60 transition-all duration-300 font-semibold text-sm w-full shadow-inner"
+              />
+            </div>
 
-          <select
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-            className="px-3 py-2 border border-gray-300 rounded focus:outline-none"
-          >
-            <option value="">Categoría</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat.name}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+            <div className="flex flex-col">
+              <label className="text-xxs font-black text-successLight uppercase tracking-widest mb-1.5">
+                Precio Unitario ($)
+              </label>
+              <input
+                type="number"
+                name="price"
+                placeholder="Ej: 1.50"
+                value={form.price}
+                onChange={handleChange}
+                className="bg-green-950/40 text-white placeholder-white/35 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-successLight/40 focus:bg-green-950/60 transition-all duration-300 font-semibold text-sm w-full shadow-inner"
+              />
+            </div>
+          </div>
 
-          <select
-            name="measureUnit"
-            value={form.measureUnit}
-            onChange={handleChange}
-            className="px-3 py-2 border border-gray-300 rounded focus:outline-none"
-          >
-            {measureUnits.map((unit) => (
-              <option key={unit._id} value={unit.name}>
-                {unit.name}
-              </option>
-            ))}
-          </select>
-
-
-          <input
-            type="number"
-            name="stock"
-            placeholder="Stock"
-            value={form.stock}
-            onChange={handleChange}
-            className="px-3 py-2 border border-gray-300 rounded focus:outline-none"
-          />
-
-          <input
-            type="number"
-            name="price"
-            placeholder="Precio"
-            value={form.price}
-            onChange={handleChange}
-            className="px-3 py-2 border border-gray-300 rounded focus:outline-none"
-          />
-
-          <div className="flex justify-between mt-4">
+          {/* Footer Actions */}
+          <div className="flex justify-between items-center mt-4">
             <Button
               onClick={onClose}
-              variant='secondary'
+              className="bg-red-500/10 text-red-400 hover:bg-red-500/25 border border-red-500/20 font-bold uppercase tracking-widest text-xs px-6 py-3.5 rounded-xl transition-all duration-300 shadow-md"
             >
-              CANCELAR
+              Cancelar
             </Button>
             <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className={`${isSubmitting ? 'bg-green-300 cursor-not-allowed' : 'bg-primaryColor'}`}
-                >
-                {isSubmitting ? 'Procesando...' : 'SIGUIENTE'}
-                </Button>
-
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className={`font-bold uppercase tracking-widest text-xs px-8 py-3.5 rounded-xl transition-all duration-300 border ${
+                isSubmitting 
+                  ? 'bg-neutral-800 text-neutral-500 border-neutral-700/50 cursor-not-allowed' 
+                  : 'bg-successLight text-primaryAltDark hover:bg-white border-successLight/10 hover:border-white shadow-[0_4px_14px_rgba(164,214,160,0.25)] hover:shadow-[0_4px_20px_rgba(255,255,255,0.2)]'
+              }`}
+            >
+              {isSubmitting ? 'Subiendo...' : 'Publicar Producto'}
+            </Button>
           </div>
         </div>
       </div>
