@@ -42,6 +42,17 @@ Nuestra plataforma ha sido dotada de herramientas innovadoras y un diseño *glas
 
 ---
 
+## 💻 Stack Tecnológico
+
+- **Frontend:** React.js + Vite + TailwindCSS
+- **Backend:** Node.js + Express
+- **Base de datos:** PostgreSQL (Prisma ORM sobre Neon Database Cloud)
+- **Mapas y Ruteo:** Leaflet.js + OpenStreetMap + OSRM Routing Engine
+- **Estilos y Estética:** TailwindCSS + Custom CSS Glassmorphism + Lucide React Icons + SweetAlert2 (customSwal)
+- **Seguridad:** JSON Web Tokens (JWT) + Cifrado robusto bcryptjs con exclusión de hashes en respuestas de red.
+
+---
+
 ## 📂 Estructura del Proyecto
 
 El repositorio está dividido en dos partes principales:
@@ -59,7 +70,7 @@ El repositorio está dividido en dos partes principales:
 
 ### 1. Variables de Entorno (.env)
 
-En la carpeta `AGRO_SERVER/`, asegúrese de tener el archivo `.env` configurado:
+En la carpeta `AGRO_SERVER/`, asegúrate de tener el archivo `.env` configurado:
 ```env
 PORT=3000
 DATABASE_URL="postgresql://usuario:contraseña@host:puerto/nombre_db?sslmode=require"
@@ -69,7 +80,7 @@ OPENROUTE_KEY=tu_llave_de_api_de_openrouteservice
 MODE=developer
 ```
 
-En la carpeta `AGRO_CLIENT/`, cree su archivo `.env`:
+En la carpeta `AGRO_CLIENT/`, crea tu archivo `.env`:
 ```env
 VITE_API_BASE_URL=http://localhost:3000/api/v1
 VITE_PUBLIC_CLOUDINARY_CLOUD_NAME=
