@@ -172,11 +172,14 @@ export const createOrder = async (req, res) => {
                 buyer.lng, buyer.lat
             );
 
-            // Calculate total for this specific seller
+            // Calculate total for this specific seller and extract product names
             let orderTotal = 0;
+            const productNamesList = [];
             for (const item of sellerItemsMap[sellerId]) {
                 orderTotal += item.product.price * item.quantity;
+                productNamesList.push(`${item.product.name} (x${item.quantity})`);
             }
+            const productNames = productNamesList.join(", ");
 
             // Verificar y actualizar stock, transferir dinero y crear la orden transaccionalmente
             const result = await prisma.$transaction(async (tx) => {
@@ -197,7 +200,11 @@ export const createOrder = async (req, res) => {
                     data: {
                         userId: buyerId,
                         type: "Compra",
-                        value: -orderTotal
+                        value: -orderTotal,
+                        metadata: {
+                            sellerName: seller.username,
+                            productNames
+                        }
                     }
                 });
 
@@ -206,7 +213,11 @@ export const createOrder = async (req, res) => {
                     data: {
                         userId: seller.id,
                         type: "Venta",
-                        value: orderTotal
+                        value: orderTotal,
+                        metadata: {
+                            buyerName: buyer.username,
+                            productNames
+                        }
                     }
                 });
 

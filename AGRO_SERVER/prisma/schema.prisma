@@ -125,12 +125,13 @@ model OrderItem {
 }
 
 model Transaction {
-  id     String   @id @default(uuid())
-  value  Float
-  type   String   // Compra, Venta
-  userId String
-  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date   DateTime @default(now())
+  id       String   @id @default(uuid())
+  value    Float
+  type     String   // Compra, Venta, Recarga, Retiro
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date     DateTime @default(now())
+  metadata Json?
 }
 
 model Purchase {

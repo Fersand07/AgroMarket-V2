@@ -52,6 +52,7 @@ const UserProfile = () => {
     fullName: ""
   });
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]{8,}$/;
 
@@ -95,9 +96,7 @@ const UserProfile = () => {
           lng: data.user.lng || null,
         });
 
-        if (data.user.role === 'seller') {
-          loadDashboardDataForUser(data.user.id);
-        }
+        loadDashboardDataForUser(data.user.id);
       }
     } catch (err) {
       console.error("No se pudo cargar el usuario:", err);
@@ -272,8 +271,15 @@ const UserProfile = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      const rawNum = cardDetails.number.replace(/\s/g, "");
+      const last4 = rawNum.length >= 4 ? rawNum.slice(-4) : "xxxx";
+      const metadata = { last4, cardName: cardDetails.name };
+
       const res = await addCredits(rechargeAmount);
+      await createTransaction("Recarga", rechargeAmount, metadata);
+      
       setUser(prev => ({ ...prev, credit: res.credits }));
+      loadDashboardDataForUser(user.id);
       
       setShowRechargeModal(false);
       setRechargeAmount("");
@@ -327,8 +333,16 @@ const UserProfile = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      const rawAcc = withdrawDetails.accountNumber.replace(/\s/g, "");
+      const last4Acc = rawAcc.length >= 4 ? rawAcc.slice(-4) : "xxxx";
+      const metadata = { 
+        bank: withdrawDetails.bank, 
+        accountNumber: last4Acc, 
+        fullName: withdrawDetails.fullName 
+      };
+
       const res = await substractCredits(withdrawAmount);
-      await createTransaction("Retiro", withdrawAmount);
+      await createTransaction("Retiro", withdrawAmount, metadata);
       
       setUser(prev => ({ ...prev, credit: res.credits }));
       
@@ -611,70 +625,125 @@ const UserProfile = () => {
           </div>
         ) : (
           /* Profile Read-Only Cards */
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* Contact details card */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-6 shadow-xl flex items-start gap-4">
-              <div className="p-3 bg-successLight/10 rounded-xl border border-successLight/20 text-successLight shrink-0">
-                <Mail className="w-5 h-5" />
-              </div>
-              <div className="space-y-3">
-                <h3 className="font-black text-white uppercase tracking-wider text-xs">Información de Contacto</h3>
-                <div className="space-y-1.5 text-sm text-white/70">
-                  <p className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-white/40 shrink-0" />
-                    <span>{formatPhoneForDisplay(user.phone) || "Teléfono no proporcionado"}</span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-white/40 shrink-0" />
-                    <span>{user.email}</span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-white/40 shrink-0" />
-                    <span>{getShortAddress(user.address) || "Dirección no proporcionada"}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Account / Earnings Details card */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
-              <div className="flex items-start gap-4">
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* Contact details card */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-6 shadow-xl flex items-start gap-4">
                 <div className="p-3 bg-successLight/10 rounded-xl border border-successLight/20 text-successLight shrink-0">
-                  <CreditCard className="w-5 h-5" />
+                  <Mail className="w-5 h-5" />
                 </div>
                 <div className="space-y-3">
-                  <h3 className="font-black text-white uppercase tracking-wider text-xs">
-                    {isSeller ? "Balance de Ganancias" : "Información de Cuenta"}
-                  </h3>
+                  <h3 className="font-black text-white uppercase tracking-wider text-xs">Información de Contacto</h3>
                   <div className="space-y-1.5 text-sm text-white/70">
-                    <p className="text-white/80">
-                      {isSeller ? "Saldo acumulado por tus ventas locales:" : "Saldo disponible para tus compras locales:"}
+                    <p className="flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-white/40 shrink-0" />
+                      <span>{formatPhoneForDisplay(user.phone) || "Teléfono no proporcionado"}</span>
                     </p>
-                    <p className="text-successLight font-black text-3xl tracking-tight mt-2">
-                      ${user.credit?.toFixed(2) || "0.00"}
+                    <p className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-white/40 shrink-0" />
+                      <span>{user.email}</span>
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-white/40 shrink-0" />
+                      <span>{getShortAddress(user.address) || "Dirección no proporcionada"}</span>
                     </p>
                   </div>
                 </div>
               </div>
-              {isSeller ? (
-                <Button
-                  className="w-full sm:w-auto bg-successLight text-primaryAltDark hover:bg-white hover:text-green-950 font-bold uppercase tracking-widest text-xs px-5 py-3 rounded-xl transition-all duration-300 border border-successLight/10 hover:border-white shadow-[0_4px_14px_rgba(164,214,160,0.2)]"
-                  onClick={() => setShowWithdrawModal(true)}
-                >
-                  Retirar Ganancias
-                </Button>
-              ) : (
-                <Button
-                  className="w-full sm:w-auto bg-successLight text-primaryAltDark hover:bg-white hover:text-green-950 font-bold uppercase tracking-widest text-xs px-5 py-3 rounded-xl transition-all duration-300 border border-successLight/10 hover:border-white shadow-[0_4px_14px_rgba(164,214,160,0.2)]"
-                  onClick={() => setShowRechargeModal(true)}
-                >
-                  Recargar Saldo
-                </Button>
-              )}
+
+              {/* Account / Earnings Details card */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-successLight/10 rounded-xl border border-successLight/20 text-successLight shrink-0">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="font-black text-white uppercase tracking-wider text-xs">
+                      {isSeller ? "Balance de Ganancias" : "Información de Cuenta"}
+                    </h3>
+                    <div className="space-y-1.5 text-sm text-white/70">
+                      <p className="text-white/80">
+                        {isSeller ? "Saldo acumulado por tus ventas locales:" : "Saldo disponible para tus compras locales:"}
+                      </p>
+                      <p className="text-successLight font-black text-3xl tracking-tight mt-2">
+                        ${user.credit?.toFixed(2) || "0.00"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {isSeller ? (
+                  <Button
+                    className="w-full sm:w-auto bg-successLight text-primaryAltDark hover:bg-white hover:text-green-950 font-bold uppercase tracking-widest text-xs px-5 py-3 rounded-xl transition-all duration-300 border border-successLight/10 hover:border-white shadow-[0_4px_14px_rgba(164,214,160,0.2)]"
+                    onClick={() => setShowWithdrawModal(true)}
+                  >
+                    Retirar Ganancias
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full sm:w-auto bg-successLight text-primaryAltDark hover:bg-white hover:text-green-950 font-bold uppercase tracking-widest text-xs px-5 py-3 rounded-xl transition-all duration-300 border border-successLight/10 hover:border-white shadow-[0_4px_14px_rgba(164,214,160,0.2)]"
+                    onClick={() => setShowRechargeModal(true)}
+                  >
+                    Recargar Saldo
+                  </Button>
+                )}
+              </div>
+
             </div>
 
-          </div>
+            {/* Buyer History Panel */}
+            {!isSeller && (
+              <div className="mt-12 pt-8 border-t border-white/10 animate-fade-in space-y-6">
+                {/* Title */}
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-successLight/10 rounded-xl border border-successLight/20 text-successLight">
+                    <Landmark className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-white uppercase tracking-wider">Historial de Movimientos</h2>
+                    <p className="text-white/50 text-xs mt-0.5">Registro de tus recargas y compras realizadas</p>
+                  </div>
+                </div>
+
+                {/* Money Transactions History for Buyer */}
+                <div className="bg-white/5 border border-white/5 rounded-2xl p-6 shadow-xl space-y-4">
+                  <div className="space-y-2.5 max-h-[400px] overflow-y-auto pr-1">
+                    {transactions.length > 0 ? (
+                      transactions.map((t) => {
+                        const isExpense = t.type.toLowerCase() === 'compra' || t.value < 0;
+                        return (
+                          <div 
+                            key={t._id} 
+                            onClick={() => setSelectedTransaction(t)}
+                            className="flex justify-between items-center p-4 bg-white/[0.01] hover:bg-white/[0.04] border border-white/5 hover:border-white/10 rounded-xl transition duration-300 text-xs cursor-pointer"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2 rounded-lg ${isExpense ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                                {isExpense ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+                              </div>
+                              <div>
+                                <p className="font-bold text-white">
+                                  {t.type === 'Recarga' ? 'Recarga de Saldo' : t.type === 'Compra' ? 'Compra de Productos' : t.type}
+                                </p>
+                                <p className="text-[9px] text-white/40 mt-0.5">
+                                  {new Date(t.date).toLocaleDateString()} a las {new Date(t.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </p>
+                              </div>
+                            </div>
+                            <span className={`font-black text-sm ${isExpense ? 'text-red-400' : 'text-successLight'}`}>
+                              {isExpense ? "-" : "+"}${Math.abs(t.value).toFixed(2)}
+                            </span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-xs text-white/40 text-center py-8 font-poppins">No hay movimientos registrados en esta cuenta.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Seller Dashboard Panel */}
@@ -869,13 +938,19 @@ const UserProfile = () => {
                   transactions.map((t) => {
                     const isRetiro = t.type.toLowerCase() === 'retiro' || t.value < 0;
                     return (
-                      <div key={t._id} className="flex justify-between items-center p-3 bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 rounded-xl transition duration-300 text-xs">
+                      <div 
+                        key={t._id} 
+                        onClick={() => setSelectedTransaction(t)}
+                        className="flex justify-between items-center p-3 bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 rounded-xl transition duration-300 text-xs cursor-pointer"
+                      >
                         <div className="flex items-center gap-3">
                           <div className={`p-2 rounded-lg ${isRetiro ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
                             {isRetiro ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
                           </div>
                           <div>
-                            <p className="font-bold text-white">{isRetiro ? "Retiro a Cuenta Bancaria" : "Ingreso por Venta Local"}</p>
+                            <p className="font-bold text-white">
+                              {t.type === 'Retiro' ? "Retiro a Cuenta Bancaria" : t.type === 'Venta' ? "Ingreso por Venta Local" : t.type}
+                            </p>
                             <p className="text-[9px] text-white/40 mt-0.5">{new Date(t.date).toLocaleDateString()} a las {new Date(t.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                           </div>
                         </div>
@@ -1315,6 +1390,189 @@ const UserProfile = () => {
                 </form>
               </div>
 
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transaction Detail Modal */}
+      {selectedTransaction && (
+        <div className="fixed inset-0 bg-[#09110a]/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in select-none">
+          <div className="bg-green-950/95 border border-white/10 rounded-3xl w-full max-w-md shadow-2xl p-6 font-poppins relative text-white">
+            <div className="flex justify-between items-center mb-5 border-b border-white/10 pb-3">
+              <h2 className="text-lg font-black uppercase tracking-wider flex items-center gap-2">
+                <Activity className="text-successLight animate-pulse" />
+                Detalle del Movimiento
+              </h2>
+              <button 
+                onClick={() => setSelectedTransaction(null)} 
+                className="text-white/60 hover:text-white font-bold text-xs tracking-wide bg-white/5 px-2.5 py-1 rounded-lg border border-white/5 hover:bg-white/10 transition-all duration-300"
+              >
+                Cerrar
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Value and Type Banner */}
+              <div className="bg-white/5 border border-white/5 rounded-2xl p-5 text-center">
+                <span className={`text-3xl font-black ${selectedTransaction.value < 0 ? 'text-red-400' : 'text-successLight'}`}>
+                  {selectedTransaction.value < 0 ? "-" : "+"}${Math.abs(selectedTransaction.value).toFixed(2)}
+                </span>
+                <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mt-1">
+                  Monto de la Transacción
+                </p>
+              </div>
+
+              {/* Detail fields */}
+              <div className="space-y-3 bg-white/[0.02] border border-white/5 rounded-2xl p-4.5 text-xs">
+                <div className="flex justify-between py-1 border-b border-white/5">
+                  <span className="text-white/40 font-bold uppercase tracking-wider">Tipo:</span>
+                  <span className="font-extrabold text-white">
+                    {selectedTransaction.type === "Recarga" ? "Recarga de Saldo" :
+                     selectedTransaction.type === "Retiro" ? "Retiro de Ganancias" :
+                     selectedTransaction.type === "Compra" ? "Compra Realizada" :
+                     selectedTransaction.type === "Venta" ? "Ingreso por Venta" :
+                     selectedTransaction.type}
+                  </span>
+                </div>
+
+                <div className="flex justify-between py-1 border-b border-white/5">
+                  <span className="text-white/40 font-bold uppercase tracking-wider">Fecha:</span>
+                  <span className="font-semibold text-white/95">
+                    {new Date(selectedTransaction.date).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between py-1 border-b border-white/5">
+                  <span className="text-white/40 font-bold uppercase tracking-wider">Hora:</span>
+                  <span className="font-semibold text-white/95">
+                    {new Date(selectedTransaction.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                  </span>
+                </div>
+
+                {/* Conditional Metadata rendering */}
+                {selectedTransaction.type === "Recarga" && (
+                  <>
+                    <div className="flex justify-between py-1 border-b border-white/5">
+                      <span className="text-white/40 font-bold uppercase tracking-wider">Método:</span>
+                      <span className="font-bold text-white">Tarjeta de Crédito / Débito</span>
+                    </div>
+                    {selectedTransaction.metadata?.last4 ? (
+                      <>
+                        <div className="flex justify-between py-1 border-b border-white/5">
+                          <span className="text-white/40 font-bold uppercase tracking-wider">Tarjeta:</span>
+                          <span className="font-mono text-white/90">•••• •••• •••• {selectedTransaction.metadata.last4}</span>
+                        </div>
+                        {selectedTransaction.metadata.cardName && (
+                          <div className="flex justify-between py-1 border-b border-white/5">
+                            <span className="text-white/40 font-bold uppercase tracking-wider">Titular:</span>
+                            <span className="font-semibold text-white/90">{selectedTransaction.metadata.cardName}</span>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="flex justify-between py-1 border-b border-white/5">
+                        <span className="text-white/40 font-bold uppercase tracking-wider">Detalles:</span>
+                        <span className="text-white/50 italic">Información de tarjeta no registrada</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {selectedTransaction.type === "Retiro" && (
+                  <>
+                    <div className="flex justify-between py-1 border-b border-white/5">
+                      <span className="text-white/40 font-bold uppercase tracking-wider">Destino:</span>
+                      <span className="font-bold text-white">Transferencia Bancaria</span>
+                    </div>
+                    {selectedTransaction.metadata?.bank ? (
+                      <>
+                        <div className="flex justify-between py-1 border-b border-white/5">
+                          <span className="text-white/40 font-bold uppercase tracking-wider">Banco:</span>
+                          <span className="font-semibold text-white/90">{selectedTransaction.metadata.bank}</span>
+                        </div>
+                        <div className="flex justify-between py-1 border-b border-white/5">
+                          <span className="text-white/40 font-bold uppercase tracking-wider">Nº Cuenta:</span>
+                          <span className="font-mono text-white/90">•••• {selectedTransaction.metadata.accountNumber}</span>
+                        </div>
+                        <div className="flex justify-between py-1 border-b border-white/5">
+                          <span className="text-white/40 font-bold uppercase tracking-wider">Titular:</span>
+                          <span className="font-semibold text-white/90">{selectedTransaction.metadata.fullName}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between py-1 border-b border-white/5">
+                        <span className="text-white/40 font-bold uppercase tracking-wider">Detalles:</span>
+                        <span className="text-white/50 italic">Información de cuenta no registrada</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {selectedTransaction.type === "Compra" && (
+                  <>
+                    <div className="flex justify-between py-1 border-b border-white/5">
+                      <span className="text-white/40 font-bold uppercase tracking-wider">Detalle:</span>
+                      <span className="font-bold text-white">Compra en AgroMarket</span>
+                    </div>
+                    {selectedTransaction.metadata?.sellerName ? (
+                      <>
+                        <div className="flex justify-between py-1 border-b border-white/5">
+                          <span className="text-white/40 font-bold uppercase tracking-wider">Vendedor:</span>
+                          <span className="font-semibold text-white/90">@{selectedTransaction.metadata.sellerName}</span>
+                        </div>
+                        <div className="flex flex-col py-1 gap-1">
+                          <span className="text-white/40 font-bold uppercase tracking-wider block">Productos:</span>
+                          <span className="font-semibold text-successLight/90 pl-2 border-l-2 border-successLight/40 leading-relaxed block max-h-[80px] overflow-y-auto">
+                            {selectedTransaction.metadata.productNames}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between py-1 border-b border-white/5">
+                        <span className="text-white/40 font-bold uppercase tracking-wider">Detalles:</span>
+                        <span className="text-white/50 italic">Compra de productos demo</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {selectedTransaction.type === "Venta" && (
+                  <>
+                    <div className="flex justify-between py-1 border-b border-white/5">
+                      <span className="text-white/40 font-bold uppercase tracking-wider">Detalle:</span>
+                      <span className="font-bold text-white">Venta Realizada</span>
+                    </div>
+                    {selectedTransaction.metadata?.buyerName ? (
+                      <>
+                        <div className="flex justify-between py-1 border-b border-white/5">
+                          <span className="text-white/40 font-bold uppercase tracking-wider">Comprador:</span>
+                          <span className="font-semibold text-white/90">@{selectedTransaction.metadata.buyerName}</span>
+                        </div>
+                        <div className="flex flex-col py-1 gap-1">
+                          <span className="text-white/40 font-bold uppercase tracking-wider block">Productos:</span>
+                          <span className="font-semibold text-successLight/90 pl-2 border-l-2 border-successLight/40 leading-relaxed block max-h-[80px] overflow-y-auto">
+                            {selectedTransaction.metadata.productNames}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between py-1 border-b border-white/5">
+                        <span className="text-white/40 font-bold uppercase tracking-wider">Detalles:</span>
+                        <span className="text-white/50 italic">Ingreso de venta local</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                <div className="flex justify-between py-1">
+                  <span className="text-white/40 font-bold uppercase tracking-wider">Estado:</span>
+                  <span className="font-bold text-emerald-400 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                    Completado
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
