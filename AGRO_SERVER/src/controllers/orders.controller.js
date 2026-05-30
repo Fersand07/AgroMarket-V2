@@ -13,9 +13,9 @@ const formatOrder = (o) => {
             username: o.buyer.username,
             phone: o.buyer.phone,
             email: o.buyer.email,
-            address: o.buyer.address,
-            lat: o.buyer.lat,
-            lng: o.buyer.lng
+            address: o.address !== null && o.address !== undefined ? o.address : o.buyer.address,
+            lat: o.lat !== null && o.lat !== undefined ? o.lat : o.buyer.lat,
+            lng: o.lng !== null && o.lng !== undefined ? o.lng : o.buyer.lng
         } : null,
         seller: o.seller ? {
             _id: o.seller.id,
@@ -169,6 +169,9 @@ export const createOrder = async (req, res) => {
                     data: {
                         buyerId: buyerId,
                         sellerId: seller.id,
+                        address: buyer.address,
+                        lat: buyer.lat,
+                        lng: buyer.lng,
                         eta: routeInfo.eta,
                         route: routeInfo.route || undefined,
                         status: 'pending'

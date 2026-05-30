@@ -101,6 +101,10 @@ model Order {
   
   items     OrderItem[]
   
+  address   String?
+  lat       Float?
+  lng       Float?
+  
   eta       String?
   route     Json?     // Almacena el geojson completo del api de OpenRoute
   status    String   @default("pending") // pending, in_progress, completed, cancelled
