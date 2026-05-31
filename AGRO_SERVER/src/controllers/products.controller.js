@@ -37,7 +37,7 @@ export const getAllProducts =  async (req, res) => {
     try {
         const products = await Product.find().populate('category').populate('measureUnit');
         res.status(200).json({ products });
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error de server" });
     }
 }
@@ -59,7 +59,7 @@ export const getProductByCategory = async (req, res) => {
         const products = await Product.find({ category
             : id }).populate('category').populate('measureUnit');
         res.status(200).json({ products });
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error de server" });
     }
 };
@@ -73,7 +73,7 @@ export const getProductsPostedByUser = async (req, res) => {
             populate("measureUnit").
             lean();
         res.status(200).json({ products });
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error de server" });
     }
 };
