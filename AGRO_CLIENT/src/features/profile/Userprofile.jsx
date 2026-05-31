@@ -723,7 +723,10 @@ const UserProfile = () => {
                               </div>
                               <div>
                                 <p className="font-bold text-white">
-                                  {t.type === 'Recarga' ? 'Recarga de Saldo' : t.type === 'Compra' ? 'Compra de Productos' : t.type}
+                                  {t.type === 'Recarga' ? 'Recarga de Saldo' :
+                                   t.type === 'Compra' ? 'Compra de Productos' :
+                                   t.type === 'Reembolso' ? 'Reembolso por Cancelación' :
+                                   t.type === 'Devolución' ? 'Cancelación de Venta' : t.type}
                                 </p>
                                 <p className="text-[9px] text-white/40 mt-0.5">
                                   {new Date(t.date).toLocaleDateString()} a las {new Date(t.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -949,7 +952,10 @@ const UserProfile = () => {
                           </div>
                           <div>
                             <p className="font-bold text-white">
-                              {t.type === 'Retiro' ? "Retiro a Cuenta Bancaria" : t.type === 'Venta' ? "Ingreso por Venta Local" : t.type}
+                              {t.type === 'Retiro' ? "Retiro a Cuenta Bancaria" :
+                               t.type === 'Venta' ? "Ingreso por Venta Local" :
+                               t.type === 'Reembolso' ? 'Reembolso por Cancelación' :
+                               t.type === 'Devolución' ? 'Cancelación de Venta' : t.type}
                             </p>
                             <p className="text-[9px] text-white/40 mt-0.5">{new Date(t.date).toLocaleDateString()} a las {new Date(t.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                           </div>
@@ -1432,6 +1438,8 @@ const UserProfile = () => {
                      selectedTransaction.type === "Retiro" ? "Retiro de Ganancias" :
                      selectedTransaction.type === "Compra" ? "Compra Realizada" :
                      selectedTransaction.type === "Venta" ? "Ingreso por Venta" :
+                     selectedTransaction.type === "Reembolso" ? "Reembolso de Compra" :
+                     selectedTransaction.type === "Devolución" ? "Devolución por Cancelación" :
                      selectedTransaction.type}
                   </span>
                 </div>
@@ -1560,6 +1568,62 @@ const UserProfile = () => {
                       <div className="flex justify-between py-1 border-b border-white/5">
                         <span className="text-white/40 font-bold uppercase tracking-wider">Detalles:</span>
                         <span className="text-white/50 italic">Ingreso de venta local</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {selectedTransaction.type === "Reembolso" && (
+                  <>
+                    <div className="flex justify-between py-1 border-b border-white/5">
+                      <span className="text-white/40 font-bold uppercase tracking-wider">Detalle:</span>
+                      <span className="font-bold text-white">Reembolso por Cancelación</span>
+                    </div>
+                    {selectedTransaction.metadata?.sellerName ? (
+                      <>
+                        <div className="flex justify-between py-1 border-b border-white/5">
+                          <span className="text-white/40 font-bold uppercase tracking-wider">Vendedor:</span>
+                          <span className="font-semibold text-white/90">@{selectedTransaction.metadata.sellerName}</span>
+                        </div>
+                        <div className="flex flex-col py-1 gap-1">
+                          <span className="text-white/40 font-bold uppercase tracking-wider block">Productos:</span>
+                          <span className="font-semibold text-successLight/90 pl-2 border-l-2 border-successLight/40 leading-relaxed block max-h-[80px] overflow-y-auto">
+                            {selectedTransaction.metadata.productNames}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between py-1 border-b border-white/5">
+                        <span className="text-white/40 font-bold uppercase tracking-wider">Detalles:</span>
+                        <span className="text-white/50 italic">Devolución de fondos</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {selectedTransaction.type === "Devolución" && (
+                  <>
+                    <div className="flex justify-between py-1 border-b border-white/5">
+                      <span className="text-white/40 font-bold uppercase tracking-wider">Detalle:</span>
+                      <span className="font-bold text-white">Cancelación de Venta (Devolución)</span>
+                    </div>
+                    {selectedTransaction.metadata?.buyerName ? (
+                      <>
+                        <div className="flex justify-between py-1 border-b border-white/5">
+                          <span className="text-white/40 font-bold uppercase tracking-wider">Comprador:</span>
+                          <span className="font-semibold text-white/90">@{selectedTransaction.metadata.buyerName}</span>
+                        </div>
+                        <div className="flex flex-col py-1 gap-1">
+                          <span className="text-white/40 font-bold uppercase tracking-wider block">Productos:</span>
+                          <span className="font-semibold text-successLight/90 pl-2 border-l-2 border-successLight/40 leading-relaxed block max-h-[80px] overflow-y-auto">
+                            {selectedTransaction.metadata.productNames}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between py-1 border-b border-white/5">
+                        <span className="text-white/40 font-bold uppercase tracking-wider">Detalles:</span>
+                        <span className="text-white/50 italic">Fondos devueltos al cliente</span>
                       </div>
                     )}
                   </>
