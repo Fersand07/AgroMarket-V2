@@ -3,6 +3,7 @@ import { MapPin, Clock, Route, Package, User, ShoppingBag } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getOrderById, updateOrderStatus } from '../../services/OrderService';
 import Button from '../../components/Button';
+import { customSwal } from '../../helpers/swalHelper';
 
 const OrderDetail = () => {
   const mapRef = useRef(null);
@@ -11,8 +12,23 @@ const OrderDetail = () => {
   const [orderData, setOrderData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [timeElapsed, setTimeElapsed] = useState(0);
   
   const role = localStorage.getItem('role');
+
+  const isSeller = role === "seller";
+
+  useEffect(() => {
+    if (orderData && orderData.status === 'pending' && !isSeller) {
+      const calculateTime = () => {
+        const diffMin = (Date.now() - new Date(orderData.createdAt).getTime()) / (1000 * 60);
+        setTimeElapsed(diffMin);
+      };
+      calculateTime();
+      const interval = setInterval(calculateTime, 10000); // recalcular cada 10s
+      return () => clearInterval(interval);
+    }
+  }, [orderData, isSeller]);
 
   const fetchOrder = React.useCallback(async () => {
     try {
@@ -43,8 +59,6 @@ const OrderDetail = () => {
       setMapLoaded(true);
     }
   }, [fetchOrder]);
-
-  const isSeller = role === "seller";
 
   useEffect(() => {
     if (mapLoaded && orderData && mapRef.current) {
@@ -187,7 +201,31 @@ const OrderDetail = () => {
 
   const handleOrderStatus = async (status) => {
     try {
+      if (status === 'cancelled') {
+        const confirmResult = await customSwal.fire({
+          title: '¿Confirmar cancelación?',
+          text: '¿Estás seguro de que deseas cancelar este pedido? Los fondos serán reembolsados.',
+          icon: 'warning',
+          iconColor: '#EF4444',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, cancelar',
+          cancelButtonText: 'No, mantener pedido',
+          reverseButtons: true
+        });
+        if (!confirmResult.isConfirmed) return;
+      }
+
       await updateOrderStatus(id, status);
+
+      customSwal.fire({
+        title: status === 'cancelled' ? 'Pedido Cancelado' : status === 'in_progress' ? 'Pedido en Ruta' : 'Pedido Completado',
+        text: status === 'cancelled' ? 'El pedido ha sido cancelado con éxito.' : status === 'in_progress' ? 'El pedido se ha enviado a ruta.' : '¡Gracias por confirmar tu entrega!',
+        icon: 'success',
+        iconColor: '#A4D6A0',
+        timer: 2000,
+        showConfirmButton: false
+      });
+
       if (status === 'completed') {
         navigate('/orders'); 
         return;
@@ -195,6 +233,12 @@ const OrderDetail = () => {
       fetchOrder();
     } catch (error) {
       console.error(error);
+      customSwal.fire({
+        title: 'Error al cambiar estado',
+        text: error.message || 'No se pudo realizar el cambio de estado.',
+        icon: 'error',
+        iconColor: '#EF4444'
+      });
     }
   };
 
@@ -224,12 +268,37 @@ const OrderDetail = () => {
     if (isSeller) {
       if (currentStatus === 'pending') {
         return (
-          <Button 
-            onClick={() => handleOrderStatus('in_progress')} 
-            className='bg-successLight text-primaryAltDark hover:bg-white hover:text-green-950 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl transition-all duration-300 border border-successLight/10 hover:border-white shadow-[0_4px_14px_rgba(164,214,160,0.25)] hover:shadow-[0_4px_20px_rgba(255,255,255,0.2)]'
-          >
-            Enviar Pedido a Ruta
-          </Button>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Button 
+              onClick={() => handleOrderStatus('in_progress')} 
+              className='bg-successLight text-primaryAltDark hover:bg-white hover:text-green-950 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl transition-all duration-300 border border-successLight/10 hover:border-white shadow-[0_4px_14px_rgba(164,214,160,0.25)]'
+            >
+              Enviar Pedido a Ruta
+            </Button>
+            <Button 
+              onClick={() => handleOrderStatus('cancelled')} 
+              className='bg-red-500/10 text-red-400 hover:bg-red-500/25 border border-red-500/20 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl transition-all duration-300 shadow-md'
+            >
+              Cancelar Pedido
+            </Button>
+          </div>
+        );
+      } else if (currentStatus === 'in_progress') {
+        return (
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Button 
+              disabled={true}
+              className='bg-neutral-800 text-neutral-500 border border-neutral-700/50 cursor-not-allowed hover:bg-neutral-800 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl'
+            >
+              Pedido en Ruta
+            </Button>
+            <Button 
+              onClick={() => handleOrderStatus('cancelled')} 
+              className='bg-red-500/10 text-red-400 hover:bg-red-500/25 border border-red-500/20 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl transition-all duration-300 shadow-md'
+            >
+              Cancelar Pedido
+            </Button>
+          </div>
         );
       } else {
         return (
@@ -238,20 +307,39 @@ const OrderDetail = () => {
             disabled={true}
             className='bg-neutral-800 text-neutral-500 border border-neutral-700/50 cursor-not-allowed hover:bg-neutral-800 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl'
           >
-            Pedido en Camino / Completado
+            {currentStatus === 'completed' || currentStatus === 'delivered' ? 'Pedido Entregado' : 'Pedido Cancelado'}
           </Button>
         );
       }
     } else {
       if (currentStatus === 'pending') {
-        return (
-          <Button 
-            onClick={() => handleOrderStatus('cancelled')} 
-            className='bg-red-500/10 text-red-400 hover:bg-red-500/25 border border-red-500/20 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl transition-all duration-300 shadow-md'
-          >
-            Cancelar Pedido
-          </Button>
-        );
+        const canCancel = timeElapsed <= 10;
+        if (canCancel) {
+          const minutesRemaining = Math.max(0, Math.ceil(10 - timeElapsed));
+          return (
+            <div className="flex flex-col items-center gap-2">
+              <Button 
+                onClick={() => handleOrderStatus('cancelled')} 
+                className='bg-red-500/10 text-red-400 hover:bg-red-500/25 border border-red-500/20 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl transition-all duration-300 shadow-md'
+              >
+                Cancelar Pedido
+              </Button>
+              <p className="text-[10px] text-white/50">Tiempo restante para cancelar: <strong className="text-successLight">{minutesRemaining} min</strong></p>
+            </div>
+          );
+        } else {
+          return (
+            <div className="flex flex-col items-center gap-2">
+              <Button 
+                disabled={true}
+                className='bg-neutral-800 text-neutral-500 border border-neutral-700/50 cursor-not-allowed hover:bg-neutral-800 font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl'
+              >
+                Cancelar Pedido
+              </Button>
+              <p className="text-[10px] text-red-400 font-medium">Límite de tiempo para cancelar (10 min) superado.</p>
+            </div>
+          );
+        }
       } else if (currentStatus === 'in_progress') {
         return (
           <Button 
