@@ -1,5 +1,4 @@
 import express from "express";
-import { body } from 'express-validator';
 import { infoUser, updateUser, changePassword, changeImage, getNearbySellers } from "../controllers/user.controller.js";
 import { requireToken } from "../middlewares/requireToken.js";
 

@@ -47,8 +47,7 @@ export const register = async (req, res) => {
         return res.status(403).json({ message: "Username already in use" });
       }
       const email = await User
-        .findOne
-        ({ email: Usr.email });
+        .findOne({ email: Usr.email });
       if (email) {
         return res.status(403).json({ message: "Email already in use" });
       }
@@ -89,7 +88,7 @@ export const refreshToken = (req, res) => {
       "No bearer": "Utiliza el formato bearer",
       "jwt malformed": "JWT mal formado"
     };
-    return res.status(401).json({ message: tokenVerificationErrors[e.message] || e.message });
+    return res.status(401).json({ message: tokenVerificationErrors[error.message] || error.message });
   }
 };
 
@@ -97,7 +96,7 @@ export const logout = (req, res) => {
   try {
     res.clearCookie("refreshToken");
     return res.status(200).json({ message: "Logout" });
-  } catch (error) {
+  } catch (_error) {
     return res.status(500).json({ message: "Error de server" });
   }
 };

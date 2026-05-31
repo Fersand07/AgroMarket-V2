@@ -1,5 +1,4 @@
 import { Transaction } from '../models/transaction.js'
-import { User } from '../models/user.js'
 import jwt from "jsonwebtoken"
 
 export const createTransaction = async (req, res) => {
@@ -16,8 +15,7 @@ export const createTransaction = async (req, res) => {
             user: id
         });
         return res.status(200).json({ transaction });
-    } catch (error) {
-        console.log(error);
+    } catch (_error) {
         res.status(500).json({ error: "Error de server" });
     }
 };
@@ -28,7 +26,7 @@ export const getTransactionByUser = async (req, res) => {
         const { id } = jwt.verify(token, process.env.SECRET_KEY);
         const alltransactions = await Transaction.find({ user: id }).lean();
         return res.status(200).json({ alltransactions });
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error de server" });
     }
 }
