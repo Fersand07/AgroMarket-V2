@@ -318,10 +318,10 @@ const UserProfile = () => {
       return;
     }
 
-    if (parseFloat(withdrawAmount) > user.credit) {
+    if (parseFloat(withdrawAmount) > withdrawableBalance) {
       customSwal.fire({
-        title: "Saldo Insuficiente",
-        text: "El monto a retirar supera tu balance de ganancias acumuladas",
+        title: "Saldo Retenible en Garantía",
+        text: `No puedes retirar fondos que están retenidos por pedidos pendientes que aún no has enviado (Garantía: $${blockedRevenue.toFixed(2)} USD).`,
         icon: "error",
         iconColor: "#EF4444"
       });
@@ -401,6 +401,15 @@ const UserProfile = () => {
   );
 
   const isSeller = user.role === 'seller';
+
+  const blockedRevenue = sellerOrders
+    .filter(o => o.status === 'pending')
+    .reduce((sum, order) => {
+      const orderTotal = order.items.reduce((acc, item) => acc + (item.product?.price || 0) * item.quantity, 0);
+      return sum + orderTotal;
+    }, 0);
+
+  const withdrawableBalance = Math.max(0, user.credit - blockedRevenue);
 
   return (
     <div className="max-w-4xl mx-auto font-poppins bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden select-none animate-fade-in">
@@ -1292,9 +1301,21 @@ const UserProfile = () => {
                   
                   <div className="space-y-4">
                     {/* Available Balance Preview */}
-                    <div className="p-4 bg-white/5 border border-white/5 rounded-xl flex items-center justify-between text-xs">
-                      <span className="text-white/60 font-semibold">Ganancias Acumuladas Disponibles:</span>
-                      <span className="text-successLight font-black text-base">${user.credit?.toFixed(2) || "0.00"}</span>
+                    <div className="p-4 bg-white/5 border border-white/5 rounded-xl flex flex-col gap-2.5 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-white/60 font-semibold">Ganancias Totales:</span>
+                        <span className="text-white font-black text-sm">${user.credit?.toFixed(2) || "0.00"}</span>
+                      </div>
+                      {blockedRevenue > 0 && (
+                        <div className="flex justify-between items-center text-red-400 font-semibold">
+                          <span>Garantía Retenida (Pedidos Pendientes):</span>
+                          <span>-${blockedRevenue.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                        <span className="text-white/80 font-bold">Saldo Neto Retirable:</span>
+                        <span className="text-successLight font-black text-base">${withdrawableBalance.toFixed(2)}</span>
+                      </div>
                     </div>
 
                     {/* Withdrawal Amount */}
@@ -1304,7 +1325,7 @@ const UserProfile = () => {
                         type="number"
                         step="0.01"
                         min="0.01"
-                        max={user.credit}
+                        max={withdrawableBalance}
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(e.target.value)}
                         className="bg-green-950/40 text-white placeholder-white/30 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-successLight/40 focus:bg-green-950/60 transition-all duration-300 font-bold text-sm shadow-inner"
