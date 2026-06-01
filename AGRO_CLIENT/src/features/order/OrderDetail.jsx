@@ -479,9 +479,9 @@ const OrderDetail = () => {
                   <p className="text-base font-extrabold text-white">
                     Cantidad: <span className="text-successLight">{item.quantity}</span>
                   </p>
-                  {item.price && (
+                  {item.product?.price !== undefined && (
                     <p className="text-xs text-white/50 font-semibold mt-0.5">
-                      ${item.price.toFixed(2)} c/u
+                      ${item.product.price.toFixed(2)} c/u
                     </p>
                   )}
                 </div>
@@ -489,10 +489,13 @@ const OrderDetail = () => {
             ))}
           </div>
           
-          <div className="mt-6 p-4 bg-successLight/10 border border-successLight/20 rounded-2xl flex items-center justify-between">
-            <span className="text-xxs font-black text-successLight uppercase tracking-widest">Resumen de Cantidades</span>
-            <span className="text-sm font-extrabold text-white">
-              {order.items.reduce((sum, item) => sum + item.quantity, 0)} unidades en total
+          <div className="mt-6 p-4 bg-successLight/10 border border-successLight/20 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div className="flex items-center gap-4">
+              <span className="text-xxs font-black text-successLight uppercase tracking-widest">Resumen de la Orden</span>
+              <span className="text-xs text-white/60 font-semibold">{order.items.reduce((sum, item) => sum + item.quantity, 0)} unidades en total</span>
+            </div>
+            <span className="text-base font-black text-white">
+              Total de la Orden: <span className="text-successLight">${order.items.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0).toFixed(2)}</span>
             </span>
           </div>
         </div>
