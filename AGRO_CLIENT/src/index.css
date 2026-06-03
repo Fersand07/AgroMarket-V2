@@ -14,3 +14,39 @@
   --color-altLight: #508845;
   --color-successLight: #A4D6A0
 }
+
+/* ======================================================== */
+/* 💳 Estilos Premium para Tarjeta de Crédito Interactiva 3D */
+/* ======================================================== */
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.credit-card-inner {
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.credit-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+/* Efecto de brillo de vidrio esmerilado (Glassmorphism) */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
