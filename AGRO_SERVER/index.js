@@ -30,9 +30,9 @@ const cortOptions = {
 
 app.use(morgan('dev'));
 app.use(cors(cortOptions));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/products', productsRoute);
 app.use('/api/v1/profile', profileRoute);
