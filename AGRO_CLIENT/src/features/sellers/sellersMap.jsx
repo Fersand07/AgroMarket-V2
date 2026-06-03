@@ -160,12 +160,22 @@ const SellersMap = () => {
         });
       }
 
-      // Agregar marcador del usuario
+      // Agregar marcador del usuario y círculo de cobertura
+      let userLat = null;
+      let userLng = null;
+
       if (user && user.location && user.location.coordinates && Array.isArray(user.location.coordinates)) {
-        const [lng, lat] = user.location.coordinates;
-        console.log(`Adding user marker: ${user.username} at [${lat}, ${lng}]`);
+        userLng = user.location.coordinates[0];
+        userLat = user.location.coordinates[1];
+      } else if (user && typeof user.lat === 'number' && typeof user.lng === 'number') {
+        userLat = user.lat;
+        userLng = user.lng;
+      }
+
+      if (userLat !== null && userLng !== null) {
+        console.log(`Adding user marker: ${user.username} at [${userLat}, ${userLng}]`);
         
-        const userMarker = window.L.marker([lat, lng], { icon: userIcon })
+        const userMarker = window.L.marker([userLat, userLng], { icon: userIcon })
             .addTo(map)
             .bindPopup(`
             <div style="text-align: center; padding: 8px; font-family: 'Poppins', sans-serif;">
@@ -176,6 +186,16 @@ const SellersMap = () => {
             `);
 
         markers.push(userMarker);
+
+        // Añadir el círculo de cobertura georreferenciada de 15 km (15000 metros)
+        const coverageCircle = window.L.circle([userLat, userLng], {
+          color: '#10B981',      
+          fillColor: '#10B981',  
+          fillOpacity: 0.1,
+          radius: 15000,         
+          weight: 2,
+          dashArray: '8, 8',     
+        }).addTo(map);
       } else {
         console.log('User marker not added - missing location data');
         console.log('User object:', user);
@@ -247,34 +267,43 @@ const SellersMap = () => {
   }, [mapLoaded, sellers, user, loading]);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 font-poppins bg-white">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Mapa de Vendedores</h1>
-        <p className="text-gray-600">Visualización de vendedores registrados en el sistema</p>
+    <div className="max-w-6xl mx-auto py-2 font-poppins select-none animate-fade-in">
+      
+      {/* Page Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-black text-white tracking-wide">Mapa de Vendedores</h1>
+        <p className="text-white/60 text-sm mt-1">Localiza de forma interactiva a todos los productores y vendedores de la zona</p>
       </div>
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
-        <div className="bg-gray-50 px-6 py-3 border-b">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-            <MapPin className="h-5 w-5 mr-2 text-gray-600" />
+
+      {/* Glassmorphic Map Container */}
+      <div className="bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden mb-6">
+        
+        {/* Card Header */}
+        <div className="bg-gradient-to-r from-successLight/15 via-primaryColor/25 to-primaryAltDark/30 px-6 py-4.5 border-b border-white/10">
+          <h2 className="text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-successLight shrink-0 animate-pulse" />
             Ubicaciones en el Mapa
           </h2>
         </div>
+
+        {/* Leaflet Map Frame */}
         <div 
           ref={mapRef} 
-          className="h-96 w-full" 
-          style={{ minHeight: '400px' }}
+          className="h-96 w-full rounded-b-3xl relative" 
+          style={{ minHeight: '450px' }}
         >
           {(!mapLoaded || loading) && (
-            <div className="flex items-center justify-center h-full bg-gray-100">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600">
-                  {!mapLoaded ? 'Cargando mapa...' : 'Cargando datos...'}
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#09110a]/90 backdrop-blur-md">
+              <div className="text-center font-poppins">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-successLight mx-auto shadow-[0_0_15px_#A4D6A0]"></div>
+                <p className="mt-4 text-white/70 font-semibold tracking-wide">
+                  {!mapLoaded ? 'Inicializando mapa Leaflet...' : 'Cargando coordenadas locales...'}
                 </p>
               </div>
             </div>
           )}
         </div>
+
       </div>
     </div>
   );
