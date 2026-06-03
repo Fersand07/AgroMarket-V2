@@ -1,11 +1,10 @@
 import { useState } from "react";
 import Button from "../../components/Button";
 import { addToCart } from "../../services/CartService";
-import Swal from "sweetalert2";
-import {  XCircle } from "lucide-react";
+import { customSwal } from "../../helpers/swalHelper";
+import { XCircle, ShoppingCart } from "lucide-react";
 
 const ModalProductDetail = ({ product, isOpen, onClose }) => {
-
   const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = async () => {
@@ -14,40 +13,42 @@ const ModalProductDetail = ({ product, isOpen, onClose }) => {
     try {
       await addToCart(product._id, quantity);
       console.log('Producto agregado exitosamente');
-      Swal.fire({
-        title: "Producto agregado al carrito",
+      customSwal.fire({
+        title: "¡Agregado al Carrito!",
+        text: `${product.name} fue añadido a tus compras`,
         icon: "success",
         showConfirmButton: false,
-        timer: 1250 
-      })
+        timer: 1500 
+      });
       onClose();
     } catch (error) {
-      console.error("Error al agregar al carrito", error)
-      Swal.fire({
-        title: "No ha sido posible agregar el producto",
+      console.error("Error al agregar al carrito", error);
+      customSwal.fire({
+        title: "Error al Agregar",
+        text: "No ha sido posible añadir el producto en este momento.",
         icon: "error",
         showConfirmButton: false,
-        timer: 1250
-      })
+        timer: 1500
+      });
     }
-  }
+  };
 
   if (!isOpen || !product) return null;
   return (
-    <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)]  flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg  p-6 w-full max-w-xl relative shadow-md">
+    <div className="fixed inset-0 z-50 backdrop-blur-md bg-black/60 flex items-center justify-center p-4 animate-fade-in select-none">
+      <div className="w-full max-w-xl bg-green-950/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden font-poppins text-white p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-xl"
+          className="absolute top-4 right-4 text-white/50 hover:text-red-400 hover:scale-110 transition duration-200 cursor-pointer"
         >
-          <XCircle/>
+          <XCircle className="w-6 h-6" />
         </button>
 
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mt-4 sm:mt-0">
           <img
             src={product.image}
             alt={product.name}
-            className="w-48 h-48 object-cover rounded-md"
+            className="w-48 h-48 object-cover rounded-2xl border border-white/10 shadow-lg shrink-0"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src =
@@ -55,29 +56,45 @@ const ModalProductDetail = ({ product, isOpen, onClose }) => {
             }}
           />
 
-          <div className="flex-1">
-            <h2 className="text-2xl font-semibold">{product.name}</h2>
-            <p className="text-gray-600 mt-1">{product.description}</p>
-            <p className="mt-2 text-lg font-bold text-green-700">
-              ${product.price}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Categoría: {product.category?.name || "Sin categoría"}
-            </p>
+          <div className="flex-1 flex flex-col justify-between h-full gap-4 text-center sm:text-left">
+            <div>
+              <h2 className="text-2xl font-black text-white tracking-wide">{product.name}</h2>
+              {product.category?.name && (
+                <span className="text-xxs font-black tracking-widest text-successLight/70 uppercase block mt-1">
+                  Categoría: {product.category.name}
+                </span>
+              )}
+              <p className="text-white/60 text-xs mt-2.5 leading-relaxed">{product.description}</p>
+            </div>
 
-            <div className="mt-4 flex items-center gap-2">
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                defaultValue={1}
-                onChange={(e) =>  setQuantity(e.target.value)}
-                className="border rounded px-2 py-1 w-20"
-                id="quantityInput"
-              />
-              <Button onClick={handleAddToCart}>
-                Agregar al carrito
-              </Button>
+            <div>
+              <p className="text-successLight font-black text-3xl tracking-tight">
+                ${product.price}
+              </p>
+              
+              <div className="mt-5 flex flex-col sm:flex-row items-center gap-3">
+                <div className="flex flex-col text-left shrink-0">
+                  <label className="text-[9px] font-black text-successLight uppercase tracking-widest mb-1 select-none text-center sm:text-left">
+                    Cantidad
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="bg-green-950/40 text-white border border-white/10 rounded-xl px-3 py-2.5 outline-none focus:border-successLight/40 focus:bg-green-950/60 transition-all duration-300 font-bold text-sm w-20 shadow-inner text-center"
+                    id="quantityInput"
+                  />
+                </div>
+                
+                <Button 
+                  onClick={handleAddToCart}
+                  className="w-full sm:w-auto bg-successLight text-primaryAltDark hover:bg-white hover:text-green-950 font-bold uppercase tracking-widest text-xs px-6 py-4 rounded-xl transition-all duration-300 border border-successLight/10 hover:border-white shadow-[0_4px_14px_rgba(164,214,160,0.25)] flex items-center justify-center gap-2 self-end h-[46px]"
+                >
+                  <ShoppingCart className="w-4 h-4 shrink-0" />
+                  Agregar al Carrito
+                </Button>
+              </div>
             </div>
           </div>
         </div>
