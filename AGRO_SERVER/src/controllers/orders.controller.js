@@ -347,9 +347,8 @@ export const updateOrder = async (req, res) => {
             return res.status(400).json({ message: "Invalid status" });
         }
 
-        const order = await prisma.order.update({
+        const order = await prisma.order.findUnique({
             where: { id },
-            data: { status },
             include: {
                 buyer: true,
                 seller: true,
@@ -357,7 +356,85 @@ export const updateOrder = async (req, res) => {
             }
         });
 
-        return res.status(200).json(formatOrder(order));
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        const isCancelling = (status === 'cancelled' && order.status === 'pending');
+
+        let orderTotal = 0;
+        const productNamesList = [];
+        for (const item of order.items) {
+            orderTotal += item.product.price * item.quantity;
+            productNamesList.push(`${item.product.name} (x${item.quantity})`);
+        }
+        const productNames = productNamesList.join(", ");
+
+        const updatedOrder = await prisma.$transaction(async (tx) => {
+            const updated = await tx.order.update({
+                where: { id },
+                data: { status },
+                include: {
+                    buyer: true,
+                    seller: true,
+                    items: { include: { product: true } }
+                }
+            });
+
+            if (isCancelling) {
+                // Refund buyer
+                await tx.user.update({
+                    where: { id: order.buyerId },
+                    data: { credit: { increment: orderTotal } }
+                });
+
+                // Deduct from seller
+                await tx.user.update({
+                    where: { id: order.sellerId },
+                    data: { credit: { decrement: orderTotal } }
+                });
+
+                // Create Refund Transaction for Buyer
+                await tx.transaction.create({
+                    data: {
+                        userId: order.buyerId,
+                        type: "Reembolso",
+                        value: orderTotal,
+                        metadata: {
+                            sellerName: order.seller.username,
+                            productNames,
+                            orderId: order.id
+                        }
+                    }
+                });
+
+                // Create Return Transaction for Seller
+                await tx.transaction.create({
+                    data: {
+                        userId: order.sellerId,
+                        type: "Devolución",
+                        value: -orderTotal,
+                        metadata: {
+                            buyerName: order.buyer.username,
+                            productNames,
+                            orderId: order.id
+                        }
+                    }
+                });
+
+                // Restore Product Stock
+                for (const item of order.items) {
+                    await tx.product.update({
+                        where: { id: item.productId },
+                        data: { stock: { increment: item.quantity } }
+                    });
+                }
+            }
+
+            return updated;
+        });
+
+        return res.status(200).json(formatOrder(updatedOrder));
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Server error" });
@@ -392,7 +469,14 @@ export const updateOrderStatus = async (req, res) => {
             cancelled: []
         };
 
-        const order = await prisma.order.findUnique({ where: { id } });
+        const order = await prisma.order.findUnique({
+            where: { id },
+            include: {
+                buyer: true,
+                seller: true,
+                items: { include: { product: true } }
+            }
+        });
         if(!order) {
             return res.status(404).json({message: "Order not found"});
         }
@@ -405,14 +489,78 @@ export const updateOrderStatus = async (req, res) => {
             });
         }
 
-        const updatedOrder = await prisma.order.update({
-            where: { id },
-            data: { status: newStatus },
-            include: {
-                buyer: true,
-                seller: true,
-                items: { include: { product: true } }
+        const isCancelling = (newStatus === 'cancelled' && currentStatus === 'pending');
+
+        let orderTotal = 0;
+        const productNamesList = [];
+        for (const item of order.items) {
+            orderTotal += item.product.price * item.quantity;
+            productNamesList.push(`${item.product.name} (x${item.quantity})`);
+        }
+        const productNames = productNamesList.join(", ");
+
+        const updatedOrder = await prisma.$transaction(async (tx) => {
+            const updated = await tx.order.update({
+                where: { id },
+                data: { status: newStatus },
+                include: {
+                    buyer: true,
+                    seller: true,
+                    items: { include: { product: true } }
+                }
+            });
+
+            if (isCancelling) {
+                // Refund buyer
+                await tx.user.update({
+                    where: { id: order.buyerId },
+                    data: { credit: { increment: orderTotal } }
+                });
+
+                // Deduct from seller
+                await tx.user.update({
+                    where: { id: order.sellerId },
+                    data: { credit: { decrement: orderTotal } }
+                });
+
+                // Create Refund Transaction for Buyer
+                await tx.transaction.create({
+                    data: {
+                        userId: order.buyerId,
+                        type: "Reembolso",
+                        value: orderTotal,
+                        metadata: {
+                            sellerName: order.seller.username,
+                            productNames,
+                            orderId: order.id
+                        }
+                    }
+                });
+
+                // Create Return Transaction for Seller
+                await tx.transaction.create({
+                    data: {
+                        userId: order.sellerId,
+                        type: "Devolución",
+                        value: -orderTotal,
+                        metadata: {
+                            buyerName: order.buyer.username,
+                            productNames,
+                            orderId: order.id
+                        }
+                    }
+                });
+
+                // Restore Product Stock
+                for (const item of order.items) {
+                    await tx.product.update({
+                        where: { id: item.productId },
+                        data: { stock: { increment: item.quantity } }
+                    });
+                }
             }
+
+            return updated;
         });
 
         return res.status(200).json({ message: "Order status updated", order: formatOrder(updatedOrder) });

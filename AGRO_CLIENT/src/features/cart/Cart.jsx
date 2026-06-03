@@ -24,6 +24,19 @@ const Cart = () => {
     }, []);
 
     const handleCreateOrder = async () => {
+        const result = await customSwal.fire({
+            title: '¿Confirmar compra?',
+            text: `¿Estás seguro de que deseas realizar esta compra por un total de $${total.toFixed(2)}?`,
+            icon: 'question',
+            iconColor: '#A4D6A0',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, comprar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        });
+
+        if (!result.isConfirmed) return;
+
         setLoading(true);
         try {
             const data = await createOrder();
@@ -43,6 +56,7 @@ const Cart = () => {
                 text: "Tu orden no ha sido creada. Verifica tu saldo.",
                 icon: "error",
                 iconColor: '#EF4444',
+
                 timer: 2500,
                 showConfirmButton: false
             });
