@@ -1,0 +1,141 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  phone     String   @unique
+  email     String   @unique
+  address   String
+  password  String
+  lat       Float
+  lng       Float
+  role      String   @default("user")
+  credit    Float    @default(0.0)
+  image     String   @default("https://res.cloudinary.com/agromarket/image/upload/v1669659305/Avatars/profile-sample.png")
+  
+  // Relaciones
+  products         Product[]
+  shoppingCart     ShoppingCart?
+  transactions     Transaction[]
+  ordersAsBuyer    Order[]        @relation("BuyerOrders")
+  ordersAsSeller   Order[]        @relation("SellerOrders")
+  purchases        Purchase[]
+}
+
+model ProductCategory {
+  id    String    @id @default(uuid())
+  name  String    @unique
+  image String    @default("http://via.placeholder.com/150x150")
+  
+  products Product[]
+}
+
+model MeasureUnit {
+  id    String    @id @default(uuid())
+  name  String    @unique
+  
+  products Product[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  quantity    Float?
+  image       String?
+  stock       Int
+  
+  // Relaciones
+  measureUnitId String
+  measureUnit   MeasureUnit @relation(fields: [measureUnitId], references: [id])
+  
+  categoryId    String
+  category      ProductCategory @relation(fields: [categoryId], references: [id])
+  
+  userId        String
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  purchases     Purchase[]
+}
+
+model ShoppingCart {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  items     CartItem[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id             String       @id @default(uuid())
+  shoppingCartId String
+  shoppingCart   ShoppingCart @relation(fields: [shoppingCartId], references: [id], onDelete: Cascade)
+  
+  productId      String
+  product        Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  quantity       Int
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  
+  buyerId   String
+  buyer     User     @relation("BuyerOrders", fields: [buyerId], references: [id])
+  
+  sellerId  String
+  seller     User     @relation("SellerOrders", fields: [sellerId], references: [id])
+  
+  items     OrderItem[]
+  
+  eta       String?
+  route     Json?     // Almacena el geojson completo del api de OpenRoute
+  status    String   @default("pending") // pending, in_progress, completed, cancelled
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  quantity  Int
+}
+
+model Transaction {
+  id     String   @id @default(uuid())
+  value  Float
+  type   String   // Compra, Venta
+  userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date   DateTime @default(now())
+}
+
+model Purchase {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  products  Product[]
+  
+  total     Float
+  date      DateTime @default(now())
+}
