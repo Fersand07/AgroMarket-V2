@@ -1,4 +1,5 @@
 import express from "express";
+import { body } from 'express-validator';
 import { userCreatedProduct, getAllProducts, getProductById, getProductsPostedByUser, getProductByCategory, updateProductCreatedByUser, deleteProductCreatedByUser, buyProductWithUserCredit, getNearbyProducts } from "../controllers/products.controller.js";
 import { requireToken } from "../middlewares/requireToken.js";
 

@@ -1,4 +1,5 @@
 import express from "express";
+import { body } from 'express-validator';
 import { uploadDataForCategories, uploadDataForMeasureUnits, uploadDataForProducts } from '../controllers/uploadSampleData.controller.js'
 
 const router = express.Router();
