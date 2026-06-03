@@ -138,12 +138,22 @@ export const createOrder = async (req, res) => {
             return res.status(400).json({ message: "Cart is empty." });
         }
 
-        // Group items by seller
-        const sellerItemsMap = {};
+        // Calculate total cost and check buyer balance
+        let grandTotal = 0;
         for (const item of cart.items) {
             if (!item.product) {
                 return res.status(404).json({ message: "Un producto en el carrito no existe." });
             }
+            grandTotal += item.product.price * item.quantity;
+        }
+
+        if (buyer.credit < grandTotal) {
+            return res.status(400).json({ message: "Créditos insuficientes para realizar esta compra." });
+        }
+
+        // Group items by seller
+        const sellerItemsMap = {};
+        for (const item of cart.items) {
             const sellerId = item.product.userId;
             if (!sellerItemsMap[sellerId]) sellerItemsMap[sellerId] = [];
             sellerItemsMap[sellerId].push(item);
@@ -162,9 +172,45 @@ export const createOrder = async (req, res) => {
                 buyer.lng, buyer.lat
             );
 
-            // Verificar y actualizar stock de cada producto, y crear la orden transaccionalmente
+            // Calculate total for this specific seller
+            let orderTotal = 0;
+            for (const item of sellerItemsMap[sellerId]) {
+                orderTotal += item.product.price * item.quantity;
+            }
+
+            // Verificar y actualizar stock, transferir dinero y crear la orden transaccionalmente
             const result = await prisma.$transaction(async (tx) => {
-                // 1. Crear la orden principal
+                // 1. Descontar créditos del comprador
+                await tx.user.update({
+                    where: { id: buyerId },
+                    data: { credit: { decrement: orderTotal } }
+                });
+
+                // 2. Incrementar créditos del vendedor
+                await tx.user.update({
+                    where: { id: seller.id },
+                    data: { credit: { increment: orderTotal } }
+                });
+
+                // 3. Crear transacción de Compra para el comprador (valor negativo)
+                await tx.transaction.create({
+                    data: {
+                        userId: buyerId,
+                        type: "Compra",
+                        value: -orderTotal
+                    }
+                });
+
+                // 4. Crear transacción de Venta para el vendedor (valor positivo)
+                await tx.transaction.create({
+                    data: {
+                        userId: seller.id,
+                        type: "Venta",
+                        value: orderTotal
+                    }
+                });
+
+                // 5. Crear la orden principal
                 const order = await tx.order.create({
                     data: {
                         buyerId: buyerId,
@@ -178,7 +224,7 @@ export const createOrder = async (req, res) => {
                     }
                 });
 
-                // 2. Crear los items de la orden y descontar el stock
+                // 6. Crear los items de la orden y descontar el stock
                 for (const item of sellerItemsMap[sellerId]) {
                     // Validar stock antes
                     const freshProd = await tx.product.findUnique({ where: { id: item.productId } });
