@@ -15,8 +15,8 @@
     {
       "name": "Auth",
       "item": [
-        { "name": "Login", "request": { "method": "POST", "url": "{{baseUrl}}/auth/login", "body": { "mode": "raw", "raw": "{\n  \"username\": \"string\",\n  \"password\": \"string\"\n}", "options": { "raw": { "language": "json" } } } } },
-        { "name": "Register", "request": { "method": "POST", "url": "{{baseUrl}}/auth/register", "body": { "mode": "raw", "raw": "{\n  \"username\": \"string\",\n  \"email\": \"string\",\n  \"address\": \"string\",\n  \"phone\": \"string\",\n  \"password\": \"string\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "Login", "request": { "method": "POST", "url": "{{baseUrl}}/auth/login", "body": { "mode": "raw", "raw": "{\\n  \\"username\\\": \\"string\\\",\\n  \\"password\\\": \\"string\\"\\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "Register", "request": { "method": "POST", "url": "{{baseUrl}}/auth/register", "body": { "mode": "raw", "raw": "{\\n  \\"username\\\": \\"string\\\",\\n  \\"email\\\": \\"string\\\",\\n  \\"address\\\": \\"string\\\",\\n  \\"phone\\\": \\"string\\\",\\n  \\"password\\\": \\"string\\"\\n}", "options": { "raw": { "language": "json" } } } } },
         { "name": "Refresh Token", "request": { "method": "GET", "url": "{{baseUrl}}/auth/refresh" } },
         { "name": "Logout", "request": { "method": "GET", "url": "{{baseUrl}}/auth/logout" } }
       ]
