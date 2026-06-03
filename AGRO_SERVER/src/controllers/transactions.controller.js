@@ -5,18 +5,21 @@ export const createTransaction = async (req, res) => {
     try {
         const authToken = req.headers.authorization && req.headers.authorization.split(" ")[1];
         const { id } = jwt.verify(authToken, process.env.SECRET_KEY)
-        let { type, value } = req.body;
+        let { type, value, metadata } = req.body;
         
         let val = parseFloat(value);
         if (type.toLowerCase() === 'compra' || type.toLowerCase() === 'retiro') {
-            val *= -1;
+            val = -Math.abs(val);
+        } else {
+            val = Math.abs(val);
         }
         
         const transaction = await prisma.transaction.create({
             data: {
                 type,
                 value: val,
-                userId: id
+                userId: id,
+                metadata: metadata || undefined
             }
         });
         
@@ -25,7 +28,8 @@ export const createTransaction = async (req, res) => {
             type: transaction.type,
             value: transaction.value,
             user: transaction.userId,
-            date: transaction.date
+            date: transaction.date,
+            metadata: transaction.metadata
         };
         
         return res.status(200).json({ transaction: formattedTransaction });
@@ -50,7 +54,8 @@ export const getTransactionByUser = async (req, res) => {
             type: t.type,
             value: t.value,
             user: t.userId,
-            date: t.date
+            date: t.date,
+            metadata: t.metadata
         }));
         
         return res.status(200).json({ alltransactions: formattedTransactions });

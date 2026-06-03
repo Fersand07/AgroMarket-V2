@@ -98,7 +98,7 @@ export async function substractCredits(amount) {
   return data;
 }
 
-export async function createTransaction(type, value) {
+export async function createTransaction(type, value, metadata = null) {
   const token = localStorage.getItem("token");
   const response = await fetch(`${API_URL}/transactions/add`, {
     method: "POST",
@@ -106,7 +106,7 @@ export async function createTransaction(type, value) {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`
     },
-    body: JSON.stringify({ type, value: parseFloat(value) })
+    body: JSON.stringify({ type, value: parseFloat(value), metadata })
   });
 
   if (!response.ok) {
