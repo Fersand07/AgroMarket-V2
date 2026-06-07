@@ -1,5 +1,22 @@
 # AgroMarket 🌾🛒📍
 
+## 👥 Información del Proyecto (Grupo 03)
+
+* **Grupo:** Grupo 03
+* **Sección:** Sección 02 (SEC02)
+
+### 🎓 Integrantes
+| N° | Apellidos, Nombres | Carnet | Sección |
+|----|---------------------|--------|---------|
+| 1 | Mejia Urias, Josue Alfredo | 00000921 | SEC02 |
+| 2 | Milian Rivera, Elias Alejandro | 00928222 | SEC02 |
+| 3 | Renderos Bernabe, Jose Gilberto | 00038121 | SEC02 |
+| 4 | Rivas Diaz, Ronald Francisco | 00131321 | SEC02 |
+| 5 | Sandoval Villalta, Fernando Rodrigo | 00007821 | SEC02 |
+| 6 | Zelada Cubias, Josue Milian | 00053722 | SEC02 |
+
+---
+
 **AgroMarket** es una plataforma tecnológica avanzada y de código abierto diseñada para transformar y potenciar la comercialización de productos agrícolas locales en El Salvador. Su propósito principal es conectar de manera inteligente a pequeños agricultores, vendedores de mercados locales y consumidores finales, utilizando geolocalización geoespacial, cálculo logístico de rutas en tiempo real y herramientas de agricultura digital.
 
 ---
