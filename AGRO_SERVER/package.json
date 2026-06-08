@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node index",
     "dev": "nodemon index",
+    "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -31,7 +32,9 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@vitest/coverage-v8": "^4.1.8",
+    "eslint": "^10.4.1",
     "nodemon": "^3.1.10",
     "prisma": "5.22.0",
     "supertest": "^7.2.2",
